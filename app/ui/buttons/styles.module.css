@@ -1,0 +1,37 @@
+.buttonPrimary {
+  appearance: none;
+  border: 0px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: var(--accent-orange);
+  transition: 225ms background-color ease;
+
+  font-weight: 600;
+  color: white;
+  padding: 12px 36px;
+  font-size: 1.6rem;
+}
+
+.buttonPrimary:hover,
+.buttonPrimary:focus {
+  background-color: var(--accent-orange-interactive);
+}
+
+.buttonSecondary {
+  appearance: none;
+  border: 0px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: var(--accent-dark);
+  transition: 225ms background-color ease;
+
+  font-weight: 600;
+  color: var(--main-dark);
+  padding: 12px 36px;
+  font-size: 1.6rem;
+}
+
+.buttonSecondary:hover,
+.buttonSecondary:focus {
+  background-color: var(--accent-dark-interactive);
+}

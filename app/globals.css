@@ -1,0 +1,45 @@
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Open Sans',
+    'Helvetica Neue',
+    sans-serif;
+}
+
+:root {
+  font-size: 10px;
+  --main-dark: #2f2f31;
+  --secondary-dark: #6f6d6d;
+  --accent-green: #96b059;
+  --accent-orange: #df783c;
+  --accent-orange-interactive: #c3591b;
+  --accent-dark: #f0f0f0;
+  --accent-dark-interactive: #dddbdb;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+}
