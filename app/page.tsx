@@ -1,6 +1,6 @@
-import BooksGrid from './ui/books_grid';
-import { fetchBookPagesCount, fetchBooksSimplified } from './lib/data';
 import styles from '@/app/home.module.css';
+import { fetchBookPagesCount, fetchSimpleBooks } from './lib/data';
+import BooksGrid from './ui/books_grid';
 
 export default async function Page({
   searchParams,
@@ -9,7 +9,7 @@ export default async function Page({
 }) {
   const currentPage = Number(searchParams.page || '1');
   const [books, pagesCount] = await Promise.all([
-    fetchBooksSimplified(currentPage),
+    fetchSimpleBooks(currentPage),
     fetchBookPagesCount(),
   ]);
 

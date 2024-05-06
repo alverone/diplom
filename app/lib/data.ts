@@ -1,313 +1,314 @@
-import { sql } from '@vercel/postgres';
-import {
-  Publisher,
-  Author,
-  Category,
-  Book,
-  BookRaw,
-  BookSimplifiedRaw,
-} from './definitions';
+import { BookType } from '@prisma/client';
 import { unstable_noStore as noStore } from 'next/cache';
-import { toBookSimplified } from './mappers';
-
-export async function fetchPublishers() {
-  noStore();
-
-  try {
-    const data = await sql<Publisher>`SELECT * FROM publishers`;
-
-    return data.rows;
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return [];
-  }
-}
-
-export async function fetchAuthors() {
-  noStore();
-  try {
-    const data = await sql<Author>`SELECT * FROM authors`;
-
-    return data.rows;
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return [];
-  }
-}
+import {
+  Author,
+  Book,
+  BookSimplified,
+  BookSimplifiedRaw,
+  Category,
+  Publisher,
+} from './definitions';
+import prisma from './prisma';
 
 export async function fetchAuthorById(id: string) {
   try {
-    const data =
-      await sql<Author>`SELECT * FROM authors WHERE id=${id} LIMIT 1;`;
+    const author = await prisma?.author.findUnique({
+      where: { id: id },
+    });
 
-    return data.rows[0];
+    if (!author) {
+      return null;
+    } else {
+      return author as Author;
+    }
   } catch (e) {
+    //FIXME:
     console.error('DatabaseError:', e);
     return null;
+  }
+}
+
+export async function fetchAllAuthors(): Promise<Author[]> {
+  noStore();
+  try {
+    const authors = await prisma?.author.findMany();
+
+    if (!authors) {
+      return [];
+    } else {
+      return authors as Author[];
+    }
+  } catch (e) {
+    //FIXME:
+    console.error('DatabaseError:', e);
+    return [];
   }
 }
 
 export async function fetchPublisherById(id: string) {
   try {
-    const data =
-      await sql<Publisher>`SELECT * FROM publishers WHERE id=${id} LIMIT 1;`;
+    const publisher = await prisma?.publisher.findUnique({
+      where: { id: id },
+    });
 
-    return data.rows[0];
+    if (!publisher) {
+      return null;
+    } else {
+      return publisher as Publisher;
+    }
   } catch (e) {
     console.error('DatabaseError:', e);
     return null;
   }
 }
 
-export async function fetchCategoryById(id: string) {
-  try {
-    const data =
-      await sql<Category>`SELECT * FROM categories WHERE id=${id} LIMIT 1;`;
+export async function fetchAllPublishers(): Promise<Publisher[]> {
+  //noStore();
 
-    return data.rows[0];
+  try {
+    const publishers = await prisma?.publisher.findMany();
+
+    if (!publishers) {
+      return [];
+    } else {
+      return publishers as Publisher[];
+    }
   } catch (e) {
+    //FIXME:
+    console.error('DatabaseError:', e);
+    return [];
+  }
+}
+
+export async function fetchCategoryById(id: string): Promise<Category | null> {
+  try {
+    const category = await prisma?.category.findUnique({
+      where: { id: id },
+    });
+
+    if (!category) {
+      return null;
+    } else {
+      return category as Category;
+    }
+  } catch (e) {
+    //FIXME:
     console.error('DatabaseError:', e);
     return null;
   }
 }
 
-export async function fetchCategories() {
+export async function fetchAllCategories(): Promise<Category[]> {
   noStore();
 
   try {
-    const data = await sql<Category>`SELECT * FROM categories`;
+    const categories = await prisma?.category.findMany();
 
-    return data.rows;
+    if (!categories) {
+      return [];
+    } else {
+      return categories as Category[];
+    }
   } catch (e) {
+    //FIXME:
     console.error('DatabaseError:', e);
+    return [];
   }
 }
 
-/*export async function fetchBooks(currentPage: number): Promise<Book[]> {
-  noStore();
-
+export async function fetchSimpleBooks(currentPage: number) {
   try {
     const offset = (currentPage - 1) * 6;
 
-    const allBooksRaw = await sql<BookRaw>`SELECT books.*, 
-        authors.id AS author_id,
-        authors.name AS author_name,
-        categories.title AS category_title,
-        categories.id AS category_id,
-        publishers.name AS publisher_name,
-        publishers.id AS publisher_id
-      FROM books
-      JOIN authors ON authors.id=books.author
-      JOIN categories ON categories.id=books.category
-      JOIN publishers ON publishers.id=books.publisher
-      LIMIT 6 OFFSET ${offset};`;
+    const bookPage = await prisma?.book.findMany({
+      take: 6,
+      skip: offset,
+      select: {
+        id: true,
+        type: true,
+        price: true,
+        authorId: true,
+        author: true,
+      },
+    });
 
-    const allBooks = allBooksRaw.rows.map((b) => toBook(b));
-
-    return allBooks;
+    if (!bookPage) {
+      return [];
+    } else {
+      return bookPage as BookSimplified[];
+    }
   } catch (e) {
     console.error('DatabaseError:', e);
     return [];
   }
-}*/
-
-export async function fetchBooksSimplified(currentPage: number) {
-  noStore();
-
-  try {
-    const offset = (currentPage - 1) * 6;
-
-    const allBooksRaw = await sql<BookSimplifiedRaw>`SELECT books.id,
-        books.title,
-        books.price,
-        books.type,
-        authors.id AS author_id,
-        authors.name AS author_name
-      FROM books
-      INNER JOIN authors ON authors.id=books.author
-      LIMIT 6 OFFSET ${offset};`;
-
-    const allBooks = allBooksRaw.rows.map((b) => toBookSimplified(b));
-
-    return allBooks;
-  } catch (e) {
-    console.error('DatabaseError:', e);
-  }
 }
 
-export async function fetchBooksSimplifiedByAuthor(
+export async function fetchSimpleBooksByAuthor(
   currentPage: number,
   authorId: string,
 ) {
-  noStore();
-
   try {
     const offset = (currentPage - 1) * 6;
 
-    const allBooksRaw = await sql<BookSimplifiedRaw>`SELECT books.id,
-        books.title,
-        books.price,
-        books.type,
-        authors.id AS author_id,
-        authors.name AS author_name
-      FROM books
-      INNER JOIN authors ON authors.id=books.author
-      WHERE authors.id=${authorId}
-      LIMIT 6 OFFSET ${offset};`;
+    const bookPage = await prisma?.book.findMany({
+      where: {
+        authorId: authorId,
+      },
+      take: 6,
+      skip: offset,
+      select: {
+        id: true,
+        type: true,
+        price: true,
+        authorId: true,
+        author: true,
+      },
+    });
 
-    const allBooks = allBooksRaw.rows.map((b) => toBookSimplified(b));
-
-    return allBooks;
+    if (!bookPage) {
+      return [];
+    } else {
+      return bookPage as BookSimplified[];
+    }
   } catch (e) {
     console.error('DatabaseError:', e);
+    return [];
   }
 }
 
-export async function fetchBooksSimplifiedByPublisher(
+export async function fetchSimpleBooksByPublisher(
   currentPage: number,
   publisherId: string,
 ) {
-  noStore();
-
   try {
     const offset = (currentPage - 1) * 6;
 
-    const allBooksRaw = await sql<BookSimplifiedRaw>`SELECT books.id,
-        books.title,
-        books.price,
-        books.type,
-        authors.id AS author_id,
-        authors.name AS author_name
-      FROM books
-      INNER JOIN authors ON authors.id=books.author
-      INNER JOIN publishers ON publishers.id=books.publisher
-      WHERE publishers.id=${publisherId}
-      LIMIT 6 OFFSET ${offset};`;
+    const bookPage = await prisma?.book.findMany({
+      where: {
+        publisherId: publisherId,
+      },
+      take: 6,
+      skip: offset,
+      select: {
+        id: true,
+        type: true,
+        price: true,
+        authorId: true,
+        author: true,
+      },
+    });
 
-    const allBooks = allBooksRaw.rows.map((b) => toBookSimplified(b));
-
-    return allBooks;
+    if (!bookPage) {
+      return [];
+    } else {
+      return bookPage as BookSimplified[];
+    }
   } catch (e) {
     console.error('DatabaseError:', e);
+    return [];
   }
 }
 
-export async function fetchBooksSimplifiedByCategory(
+export async function fetchSimpleBooksByCategory(
   currentPage: number,
   categoryId: string,
 ) {
-  noStore();
-
   try {
     const offset = (currentPage - 1) * 6;
 
-    const allBooksRaw = await sql<BookSimplifiedRaw>`SELECT books.id,
-        books.title,
-        books.price,
-        books.type,
-        authors.id AS author_id,
-        authors.name AS author_name
-      FROM books
-      INNER JOIN authors ON authors.id=books.author
-      INNER JOIN categories ON categories.id=books.category
-      WHERE categories.id=${categoryId}
-      LIMIT 6 OFFSET ${offset};`;
+    const bookPage = await prisma?.book.findMany({
+      where: {
+        categoryId: categoryId,
+      },
+      take: 6,
+      skip: offset,
+      select: {
+        id: true,
+        type: true,
+        price: true,
+        authorId: true,
+        author: true,
+        title: true,
+      },
+    });
 
-    const allBooks = allBooksRaw.rows.map((b) => toBookSimplified(b));
-
-    return allBooks;
+    if (!bookPage) {
+      return [];
+    } else {
+      return bookPage as BookSimplified[];
+    }
   } catch (e) {
     console.error('DatabaseError:', e);
+    return [];
   }
 }
 
-export async function fetchBooksSimplifiedByAuthorCount(authorId: string) {
-  noStore();
-
+export async function fetchSimpleBooksCountByAuthor(authorId: string) {
   try {
-    const data = await sql`SELECT COUNT(*)
-      FROM books
-      INNER JOIN authors ON authors.id=books.author
-      WHERE authors.id=${authorId}`;
+    const authorBooks = await prisma?.book.count({
+      where: { authorId: authorId },
+    });
 
-    const numberOfPages = Number(data.rows[0].count ?? '0') / 6;
+    const numberOfPages = authorBooks ? authorBooks / 6 : 1;
 
-    return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
+    return Math.max(Math.ceil(numberOfPages), 1);
   } catch (e) {
     console.error('DatabaseError:', e);
+    return 1;
   }
 }
 
-export async function fetchBooksSimplifiedByPublisherCount(
-  publisherId: string,
-) {
-  noStore();
-
+export async function fetchSimpleBooksCountByPublisher(publisherId: string) {
   try {
-    const data = await sql`SELECT COUNT(*)
-      FROM books
-      INNER JOIN publishers ON publishers.id=books.publisher
-      WHERE publishers.id=${publisherId}`;
+    const publisherBooks = await prisma?.book.count({
+      where: { publisherId: publisherId },
+    });
 
-    const numberOfPages = Number(data.rows[0].count ?? '0') / 6;
+    const numberOfPages = publisherBooks ? publisherBooks / 6 : 1;
 
-    return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
+    return Math.max(Math.ceil(numberOfPages), 1);
   } catch (e) {
     console.error('DatabaseError:', e);
+    return 1;
   }
 }
 
-export async function fetchBooksSimplifiedByCategoryCount(categoryId: string) {
-  noStore();
-
+export async function fetchSimpleBooksCountByCategory(
+  categoryId: string,
+): Promise<number> {
   try {
-    const data = await sql`SELECT COUNT(*)
-      FROM books
-      INNER JOIN categories ON categories.id=books.category
-      WHERE categories.id=${categoryId}`;
+    const categoryBooks = await prisma?.book.count({
+      where: {
+        categoryId: categoryId,
+      },
+    });
 
-    const numberOfPages = Number(data.rows[0].count ?? '0') / 6;
+    const numberOfPages = categoryBooks ? categoryBooks / 6 : 1;
 
-    return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
+    return Math.max(Math.ceil(numberOfPages), 1);
   } catch (e) {
     console.error('DatabaseError:', e);
+    return 1;
   }
 }
 
-export async function fetchBookById(id: string) {
+export async function fetchBookById(id: string): Promise<Book | null> {
   noStore();
   try {
-    const book = (
-      await sql<BookRaw>`
-      SELECT *
-      FROM books
-      WHERE id=${id} LIMIT 1;`
-    ).rows[0];
+    const book = await prisma?.book.findUnique({
+      where: { id: id },
+      include: {
+        publisher: true,
+        author: true,
+        category: true,
+      },
+    });
 
     if (!book) {
       return null;
+    } else {
+      return book as Book;
     }
-
-    const [author, category, publisher] = await Promise.all([
-      sql<Author>`SELECT *
-        FROM authors
-        WHERE authors.id=${book.author}`,
-      sql<Category>`SELECT *
-        FROM categories
-        WHERE categories.id=${book.category}`,
-      sql<Publisher>`SELECT *
-        FROM publishers
-        WHERE publishers.id=${book.publisher}`,
-    ]);
-
-    const bookTyped = (<unknown>{
-      ...book,
-      author: author.rows[0],
-      category: category.rows[0],
-      publisher: publisher.rows[0],
-    }) as Book;
-
-    return bookTyped as Book;
   } catch (e) {
     console.error('DatabaseError:', e);
     return null;
@@ -316,125 +317,22 @@ export async function fetchBookById(id: string) {
 
 export async function fetchBookPagesCount() {
   try {
-    const data = await sql`SELECT COUNT(*) from books;`;
+    const bookCount = await prisma?.book.count();
 
-    const numberOfPages = Number(data.rows[0].count ?? '0') / 6;
+    const numberOfPages = Number(bookCount ?? '0') / 6;
 
     return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
   } catch (e) {
-    console.error('foobar:', e);
-    throw e;
+    console.error('DatabaseError:', e);
     return 1;
   }
 }
 
-/*export async function drop() {
-  await sql`DROP TABLE IF EXISTS revenue;`;
-  await sql`DROP TABLE IF EXISTS customers;`;
-  await sql`DROP TABLE IF EXISTS invoices;`;
-  await sql`DROP TABLE IF EXISTS users;`;
-}*/
-
-export async function createIfNotExistsAuthor(
-  authorName: string,
-): Promise<Author | undefined> {
-  try {
-    await sql`INSERT INTO authors (name)
-    VALUES(${authorName})
-    ON CONFLICT (name) DO NOTHING;`;
-    const data = await sql<Author>`SELECT *
-      FROM authors
-      WHERE UPPER(name)=UPPER(${authorName})
-      LIMIT 1;`;
-
-    return data.rows[0];
-  } catch (e) {
-    console.error('DatabaseError:', e);
-  }
-}
-
-export async function createIfNotExistsCategory(
-  categoryTitle: string,
-): Promise<Category | undefined> {
-  try {
-    await sql`INSERT INTO categories (title)
-    VALUES(${categoryTitle})
-    ON CONFLICT (id) DO NOTHING;`;
-    const data = await sql<Category>`SELECT *
-      FROM categories
-      WHERE title=${categoryTitle}
-      LIMIT 1;`;
-
-    return data.rows[0];
-  } catch (e) {
-    console.error('DatabaseError:', e);
-  }
-}
-
-export async function createIfNotExistsPublisher(
-  publisherName: string,
-  description?: string,
-): Promise<Publisher | undefined> {
-  try {
-    await sql`INSERT INTO publishers (name, description)
-    VALUES(${publisherName}, ${!description ? null : description})
-    ON CONFLICT (id) DO NOTHING;`;
-    const data = await sql<Publisher>`SELECT *
-      FROM publishers
-      WHERE name=${publisherName}
-      LIMIT 1;`;
-
-    return data.rows[0];
-  } catch (e) {
-    console.error('DatabaseError:', e);
-  }
-}
-
-/*export async function createBook(
-  bookPayload: BookPayload,
-): Promise<Book | undefined> {
-  try {
-    const [author, publisher, category] = await Promise.all([
-      createIfNotExistsAuthor(bookPayload.author_name),
-      createIfNotExistsCategory(bookPayload.category_title),
-      createIfNotExistsPublisher(bookPayload.publisher_name),
-    ]);
-
-    const {
-      title,
-      description,
-      price,
-      publish_date,
-      page_length,
-      type,
-      imageUrl,
-    } = bookPayload;
-
-    await sql`
-    INSERT INTO books (title, description, price, publish_date, page_length, type, imageUrl, author, publisher, category)
-    VALUES(${title}, ${description}, ${price}, ${
-      publish_date.toISOString().split('T')[0]
-    }, ${page_length}, ${type}, ${!imageUrl ? null : imageUrl}, ${
-      author!.id
-    }, ${category!.id}, ${publisher!.id});`;
-
-    const book = await sql<BookRaw>`
-    SELECT *
-    FROM books
-    WHERE title=${title} LIMIT 1;`;
-
-    return toBook(book.rows[0]);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-  }
-}*/
-
-export async function fetchBooksSimplifiedFiltered(
+//FIXME:
+export async function fetchSimpleBooksFiltered(
   term: string,
   currentPage: number,
 ) {
-  noStore();
-
   try {
     if (term.trim().length == 0) {
       return [];
@@ -443,56 +341,72 @@ export async function fetchBooksSimplifiedFiltered(
     const offset = (currentPage - 1) * 6;
     const q = `%${term}%`;
 
-    const allBooksRaw = await sql<BookSimplifiedRaw>`
-    SELECT 
-      books.id,
-      books.title,
-      books.price,
-      books.type,
-      authors.id AS author_id,
-      authors.name AS author_name
-    FROM books
-    INNER JOIN authors ON authors.id=books.author
-    INNER JOIN publishers ON publishers.id=books.publisher
-    INNER JOIN categories ON categories.id=books.category
-    WHERE UPPER(books.title) ILIKE UPPER(${q}) OR
-      books.publish_date::text ILIKE ${q} OR
-      books.description ILIKE ${q} OR
-      authors.name ILIKE ${q} OR
-      publishers.name ILIKE ${q} OR
-      categories.title ILIKE ${q}
-      LIMIT 6 OFFSET ${offset};`;
+    const bookPage = await prisma.$queryRaw<BookSimplifiedRaw[] | null>`
+    SELECT      books.id,
+                books.title,
+                books.price,
+                books.type,
+                authors.name AS author_name,
+                authors.id AS author_id,
+                authors.description AS author_description
+    FROM        books
+    INNER JOIN  authors ON authors.id=books.author_id
+    INNER JOIN  publishers ON publishers.id=books.publisher_id
+    INNER JOIN  categories ON categories.id=books.category_id
+    WHERE       books.title ILIKE ${q} OR
+                books.description ILIKE ${q} OR
+                authors.name ILIKE ${q} OR
+                publishers.name ILIKE ${q} OR
+                categories.title ILIKE ${q}
+    ORDER BY    books.id ASC
+    LIMIT 6     OFFSET ${offset};`;
 
-    const allBooks = allBooksRaw.rows.map((b) => toBookSimplified(b));
-
-    return allBooks;
+    if (!bookPage) {
+      return [];
+    } else {
+      return bookPage.map((b) => {
+        return {
+          id: b.id,
+          title: b.title,
+          price: b.price,
+          type: b.type == 'ELECTRONIC' ? BookType.ELECTRONIC : BookType.PAPER,
+          authorId: b.author_id,
+          author: {
+            id: b.author_id,
+            name: b.author_name,
+            description: b.author_description,
+          } as Author,
+        } as BookSimplified;
+      });
+    }
   } catch (e) {
     console.error('DatabaseError:', e);
+    return [];
   }
 }
 
-export async function fetchBooksSimplifiedFilteredCount(term: string) {
-  noStore();
-
+//FIXME:
+export async function fetchSimpleFilteredBooksCount(term: string) {
   try {
     const q = `%${term}%`;
 
-    const allBooksRaw = await sql`
-    SELECT 
-      COUNT(*)
-    FROM books
-    INNER JOIN authors ON authors.id=books.author
-    INNER JOIN publishers ON publishers.id=books.publisher
-    INNER JOIN categories ON categories.id=books.category
-    WHERE books.title ILIKE ${q} OR
-      books.publish_date::text ILIKE ${q} OR
-      books.description ILIKE ${q} OR
-      authors.name ILIKE ${q} OR
-      publishers.name ILIKE ${q} OR
-      categories.title ILIKE ${q};`;
+    const books = await prisma.$queryRaw<number | null>`
+    SELECT      COUNT(*)
+    FROM        books
+    INNER JOIN  authors ON authors.id=books.author_id
+    INNER JOIN  publishers ON publishers.id=books.publisher_id
+    INNER JOIN  categories ON categories.id=books.category_id
+    WHERE       books.title ILIKE ${q} OR
+                books.description ILIKE ${q} OR
+                authors.name ILIKE ${q} OR
+                publishers.name ILIKE ${q} OR
+                categories.title ILIKE ${q};`;
 
-    return Math.ceil(Number(allBooksRaw.rows[0].count || '1') / 6);
+    const numberOfPages = books ? books / 6 : 1;
+
+    return Math.max(Math.ceil(numberOfPages), 1);
   } catch (e) {
     console.error('DatabaseError:', e);
+    return 1;
   }
 }

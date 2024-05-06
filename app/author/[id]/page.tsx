@@ -1,11 +1,11 @@
+import styles from '@/app/author/[id]/styles.module.css';
 import {
   fetchAuthorById,
-  fetchBooksSimplifiedByAuthor,
-  fetchBooksSimplifiedByAuthorCount,
+  fetchSimpleBooksByAuthor,
+  fetchSimpleBooksCountByAuthor,
 } from '@/app/lib/data';
 import BooksGrid from '@/app/ui/books_grid';
 import NotFoundPlaceholder from '@/app/ui/not_found_placeholder';
-import styles from '@/app/author/[id]/styles.module.css';
 
 export default async function Page({
   params,
@@ -18,8 +18,8 @@ export default async function Page({
     return <NotFoundPlaceholder />;
   }
 
-  const pageCount = await fetchBooksSimplifiedByAuthorCount(author.id);
-  const books = await fetchBooksSimplifiedByAuthor(1, author.id);
+  const pageCount = await fetchSimpleBooksCountByAuthor(author.id);
+  const books = await fetchSimpleBooksByAuthor(1, author.id);
 
   return (
     <main>

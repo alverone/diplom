@@ -1,80 +1,62 @@
+import { $Enums } from '@prisma/client';
+
 export interface Category {
   id: string;
   title: string;
-  description?: string;
+  description: string | null;
 }
 
 export interface Author {
   id: string;
   name: string;
-  description?: string;
+  description: string | null;
 }
 
 export interface Publisher {
   id: string;
   name: string;
-  description?: string;
+  description: string | null;
 }
 
-export enum BookType {
-  Electronic = 'electronic',
-  Paper = 'paper',
-}
-
-export interface BookRaw {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  publish_date: Date;
-  page_length: number;
-  type: string;
-  imageUrl?: string;
-  author: string;
-  publisher: string;
-  category: string;
-}
+export type BookType = $Enums.BookType;
 
 export interface BookSimplifiedRaw {
   id: string;
   type: string;
   price: number;
+  title: string;
   author_name: string;
   author_id: string;
-  title: string;
+  author_description: string | null;
 }
 
 export interface BookSimplified {
   id: string;
-  type: BookType;
   price: number;
-  author: Author;
   title: string;
+  type: BookType;
+
+  authorId: string;
+  author: Author;
 }
 
 export interface Book {
   id: string;
   title: string;
-  category: Category;
   description: string;
   price: number;
-  author: Author;
-  publisher: Publisher;
-  publish_date: Date;
-  page_length: number;
+  publishDate: Date;
+  pageLength: number;
   type: BookType;
-  imageUrl?: string;
+
+  category: Category;
+  categoryId: string;
+
+  author: Author;
+  authorId: string;
+
+  publisher: Publisher;
+  publisherId: string;
 }
 
-export interface BookPayload {
-  title: string;
-  description: string;
-  price: number;
-  publish_date: Date;
-  page_length: number;
-  type: string;
-  imageUrl?: string;
-  author_name: string;
-  publisher_name: string;
-  category_title: string;
-}
+export { $Enums };

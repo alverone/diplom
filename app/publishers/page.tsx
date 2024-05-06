@@ -1,9 +1,9 @@
-import { fetchPublishers } from '@/app/lib/data';
+import { fetchAllPublishers } from '@/app/lib/data';
 import styles from '@/app/publishers/styles.module.css';
 import Link from 'next/link';
 
 export default async function Page() {
-  const publishers = await fetchPublishers();
+  const publishers = await fetchAllPublishers();
 
   if (!publishers || publishers.length == 0) {
     return (

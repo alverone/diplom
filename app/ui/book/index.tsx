@@ -1,10 +1,10 @@
-import styles from '@/app/ui/book/styles.module.css';
-import Link from 'next/link';
-import { formatCurrency } from '@/app/lib/utils';
-import { ButtonPrimary, ButtonSecondary } from '../buttons';
 import { Book } from '@/app/lib/definitions';
+import { formatCurrency } from '@/app/lib/utils';
+import styles from '@/app/ui/book/styles.module.css';
 import Image from 'next/image';
+import Link from 'next/link';
 import BookEdition from '../book_edition';
+import { ButtonPrimary, ButtonSecondary } from '../buttons';
 
 export default function BookView({ book }: { book: Book }) {
   return (
@@ -54,8 +54,8 @@ export default function BookView({ book }: { book: Book }) {
                     </Link>
                   }
                 </p>
-                <p>Кількість сторінок: {book.page_length}</p>
-                <p>Рік видання: {book.publish_date.getFullYear()}</p>
+                <p>Кількість сторінок: {book.pageLength}</p>
+                <p>Рік видання: {book.publishDate.getFullYear()}</p>
               </div>
             </div>
 

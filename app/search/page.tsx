@@ -1,9 +1,9 @@
+import styles from '@/app/search/styles.module.css';
 import {
-  fetchBooksSimplifiedFiltered,
-  fetchBooksSimplifiedFilteredCount,
+  fetchSimpleBooksFiltered,
+  fetchSimpleFilteredBooksCount,
 } from '../lib/data';
 import BooksGrid from '../ui/books_grid';
-import styles from '@/app/search/styles.module.css';
 
 export default async function Page({
   searchParams,
@@ -12,8 +12,9 @@ export default async function Page({
 }) {
   const query = searchParams.query?.trim() ?? '';
   const currentPage = Number(searchParams.page || '1');
-  const count = await fetchBooksSimplifiedFilteredCount(query);
-  const books = await fetchBooksSimplifiedFiltered(query, currentPage);
+
+  const count = await fetchSimpleFilteredBooksCount(query);
+  const books = await fetchSimpleBooksFiltered(query, currentPage);
 
   return (
     <main>

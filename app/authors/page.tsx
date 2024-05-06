@@ -1,9 +1,9 @@
-import { fetchAuthors } from '@/app/lib/data';
 import styles from '@/app/authors/styles.module.css';
+import { fetchAllAuthors } from '@/app/lib/data';
 import Link from 'next/link';
 
 export default async function Page() {
-  const authors = await fetchAuthors();
+  const authors = await fetchAllAuthors();
 
   if (!authors || authors.length == 0) {
     return (

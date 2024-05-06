@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Book {
+  id          String    @id @default(uuid())
+  title       String    @unique
+  description String
+  price       Float
+  publishDate DateTime  @map("publish_date")
+  pageLength  Int       @map("page_length")
+  type        BookType  @default(PAPER)
+  categoryId  String    @map("category_id")
+  publisherId String    @map("publisher_id")
+  authorId    String    @map("author_id")
+  author      Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  publisher   Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+
+  @@map("books")
+}
+
+model Author {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  books       Book[]
+
+  @@map("authors")
+}
+
+model Category {
+  id          String  @id @default(uuid())
+  title       String  @unique
+  description String?
+  books       Book[]
+
+  @@map("categories")
+}
+
+model Publisher {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  books       Book[]
+
+  @@map("publishers")
+}
+
+enum BookType {
+  ELECTRONIC
+  PAPER
+}
