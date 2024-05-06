@@ -1,9 +1,9 @@
 import { BookSimplified } from '@/app/lib/definitions';
+import { formatCurrency } from '@/app/lib/utils';
 import styles from '@/app/ui/book_card/styles.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import BookEdition from '../book_edition';
-import { formatCurrency } from '@/app/lib/utils';
 
 export default function BookCard({ book }: { book: BookSimplified }) {
   return (

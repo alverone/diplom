@@ -1,7 +1,7 @@
+import styles from '@/app/book/[id]/styles.module.css';
 import { fetchBookById } from '@/app/lib/data';
 import Book from '@/app/ui/book';
 import { notFound } from 'next/navigation';
-import styles from '@/app/book/[id]/styles.module.css';
 
 export default async function Page({ params }: { params: { id: string } }) {
   const bookId = params.id;

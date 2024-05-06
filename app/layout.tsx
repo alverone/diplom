@@ -1,7 +1,7 @@
-import '@/app/normalize.css';
 import '@/app/globals.css';
-import Nav from '@/app/ui/nav';
+import '@/app/normalize.css';
 import styles from '@/app/ui/layout.module.css';
+import Nav from '@/app/ui/nav';
 import Footer from './ui/footer';
 
 export default function RootLayout({

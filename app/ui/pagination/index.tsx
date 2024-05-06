@@ -1,10 +1,10 @@
 'use client';
 
+import { generatePagination } from '@/app/lib/utils';
+import styles from '@/app/ui/pagination/styles.module.css';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { generatePagination } from '@/app/lib/utils';
 import { usePathname, useSearchParams } from 'next/navigation';
-import styles from '@/app/ui/pagination/styles.module.css';
 
 export default function Pagination({ totalPages }: { totalPages: number }) {
   const pathName = usePathname();

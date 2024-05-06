@@ -1,9 +1,10 @@
 'use client';
 
+import { BookSimplified } from '@/app/lib/definitions';
 import styles from '@/app/ui/books_grid/styles.module.css';
+import { Suspense } from 'react';
 import BookCard from '../book_card';
 import Pagination from '../pagination';
-import { BookSimplified } from '@/app/lib/definitions';
 
 export default function BooksGrid({
   books,
@@ -18,7 +19,9 @@ export default function BooksGrid({
         <div className={styles.empty}>
           <h2>За цим пошуковим запитом товарів не знайдено.</h2>
         </div>
-        <Pagination totalPages={1}></Pagination>
+        <Suspense>
+          <Pagination totalPages={1}></Pagination>
+        </Suspense>
       </>
     );
   }
@@ -28,7 +31,9 @@ export default function BooksGrid({
       <div className={styles.booksGrid}>
         {books && books.map((e) => <BookCard book={e} key={e.id} />)}
       </div>
-      <Pagination totalPages={pagesCount}></Pagination>
+      <Suspense>
+        <Pagination totalPages={pagesCount}></Pagination>
+      </Suspense>
     </div>
   );
 }

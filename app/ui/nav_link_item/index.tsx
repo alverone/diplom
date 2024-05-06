@@ -1,8 +1,8 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import styles from '@/app/ui/nav_link_item/styles.module.css';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function NavLinkItem({
   text,

@@ -1,5 +1,4 @@
 import { BookType } from '@prisma/client';
-import { unstable_noStore as noStore } from 'next/cache';
 import {
   Author,
   Book,
@@ -29,7 +28,6 @@ export async function fetchAuthorById(id: string) {
 }
 
 export async function fetchAllAuthors(): Promise<Author[]> {
-  noStore();
   try {
     const authors = await prisma?.author.findMany();
 
@@ -63,8 +61,6 @@ export async function fetchPublisherById(id: string) {
 }
 
 export async function fetchAllPublishers(): Promise<Publisher[]> {
-  //noStore();
-
   try {
     const publishers = await prisma?.publisher.findMany();
 
@@ -99,8 +95,6 @@ export async function fetchCategoryById(id: string): Promise<Category | null> {
 }
 
 export async function fetchAllCategories(): Promise<Category[]> {
-  noStore();
-
   try {
     const categories = await prisma?.category.findMany();
 
@@ -293,7 +287,6 @@ export async function fetchSimpleBooksCountByCategory(
 }
 
 export async function fetchBookById(id: string): Promise<Book | null> {
-  noStore();
   try {
     const book = await prisma?.book.findUnique({
       where: { id: id },

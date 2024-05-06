@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import NavLinkItem from '../nav_link_item';
 import styles from '@/app/ui/footer/styles.module.css';
 import Image from 'next/image';
+import Link from 'next/link';
+import NavLinkItem from '../nav_link_item';
 
 export default function Footer() {
   return (

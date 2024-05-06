@@ -1,9 +1,9 @@
 'use client';
 
-import Image from 'next/image';
-import { ButtonPrimary } from '../buttons';
-import { useRouter } from 'next/navigation';
 import styles from '@/app/ui/not_found_placeholder/styles.module.css';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { ButtonPrimary } from '../buttons';
 
 export default function NotFoundPlaceholder() {
   const router = useRouter();
