@@ -24,7 +24,7 @@ export default function NotFoundPlaceholder() {
         </p>
       </div>
       <ButtonPrimary
-        text="На головну"
+        label="На головну"
         onClick={() => {
           router.replace('/');
         }}

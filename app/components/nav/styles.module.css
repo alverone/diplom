@@ -3,7 +3,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  column-gap: 24px;
+  column-gap: 16px;
   max-width: 1240px;
   width: 100%;
 }
@@ -35,7 +35,7 @@
   visibility: none;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 978px) {
   .linksDesktop {
     display: none;
     visibility: none;

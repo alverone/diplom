@@ -1,4 +1,4 @@
-import BooksGrid from '.@/app/components/books_grid';
+import BooksGrid from '@/app/components/books_grid';
 import styles from '@/app/search/styles.module.css';
 import {
   fetchSimpleBooksFiltered,

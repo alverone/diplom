@@ -24,8 +24,10 @@ if (process.env.NODE_ENV === 'production') {
   prismaRef.value = new PrismaClient();
 } else {
   if (!prismaRef.value) {
-    prismaRef.value = new PrismaClient({ log: ['query'] });
+    prismaRef.value = new PrismaClient({
+      /*log: ['query']*/
+    });
   }
 }
 
-export default prismaRef!.value;
+export default prismaRef!.value as PrismaClient;

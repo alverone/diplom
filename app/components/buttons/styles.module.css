@@ -35,3 +35,54 @@
 .buttonSecondary:focus {
   background-color: var(--accent-dark-interactive);
 }
+
+.buttonTertiary {
+  appearance: none;
+  border: 0px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: transparent;
+  transition: 225ms background-color ease;
+  font-weight: 600;
+  color: var(--main-dark);
+  padding: 12px;
+  font-size: 1.6rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  column-gap: 6px;
+}
+
+.buttonTertiary:hover,
+.buttonTertiary:focus {
+  background-color: var(--accent-dark);
+}
+
+.buttonFullWidth {
+  width: 100%;
+  max-width: 100%;
+}
+
+.loader {
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@media (max-width: 480px) {
+  .buttonTertiary {
+    font-size: 0;
+    column-gap: 0;
+    background-color: var(--accent-dark);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

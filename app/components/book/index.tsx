@@ -1,6 +1,7 @@
 import styles from '@/app/components/book/styles.module.css';
 import { Book } from '@/app/lib/definitions';
 import { formatCurrency } from '@/app/lib/utils';
+import { getServerSession } from 'next-auth';
 import Image from 'next/image';
 import Link from 'next/link';
 import BookEdition from '../book_edition';
@@ -64,14 +65,22 @@ export default function BookView({ book }: { book: Book }) {
             <div className={`${styles.clflx} ${styles.availabilityContainer}`}>
               <p className={styles.availability}>У наявності</p>
               <p className={styles.price}>{formatCurrency(book.price)}</p>
-              <div className={`${styles.rwflx} ${styles.buttonContainer}`}>
-                <ButtonPrimary text="В кошик" />
-                <ButtonSecondary text="В обране" />
-              </div>
+              <BookActions />
             </div>
           </div>
         </div>
       )}
     </>
+  );
+}
+
+async function BookActions() {
+  const session = await getServerSession();
+
+  return (
+    <div className={`${styles.rwflx} ${styles.buttonContainer}`}>
+      <ButtonPrimary label="В кошик" />
+      {session && <ButtonSecondary label="В обране" />}
+    </div>
   );
 }
