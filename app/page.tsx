@@ -1,6 +1,6 @@
+import BooksGrid from '@/app/components/books_grid';
 import styles from '@/app/home.module.css';
 import { fetchBookPagesCount, fetchSimpleBooks } from './lib/data';
-import BooksGrid from './ui/books_grid';
 
 export default async function Page({
   searchParams,

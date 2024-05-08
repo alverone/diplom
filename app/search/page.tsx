@@ -1,9 +1,9 @@
+import BooksGrid from '.@/app/components/books_grid';
 import styles from '@/app/search/styles.module.css';
 import {
   fetchSimpleBooksFiltered,
   fetchSimpleFilteredBooksCount,
 } from '../lib/data';
-import BooksGrid from '../ui/books_grid';
 
 export default async function Page({
   searchParams,

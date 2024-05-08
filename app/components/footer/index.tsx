@@ -1,4 +1,4 @@
-import styles from '@/app/ui/footer/styles.module.css';
+import styles from '@/app/components/footer/styles.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import NavLinkItem from '../nav_link_item';

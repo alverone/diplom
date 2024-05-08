@@ -1,4 +1,4 @@
-import styles from '@/app/ui/buttons/styles.module.css';
+import styles from '@/app/components/buttons/styles.module.css';
 import { MouseEventHandler } from 'react';
 
 export function ButtonPrimary({

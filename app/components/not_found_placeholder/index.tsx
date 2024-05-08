@@ -1,6 +1,6 @@
 'use client';
 
-import styles from '@/app/ui/not_found_placeholder/styles.module.css';
+import styles from '@/app/components/not_found_placeholder/styles.module.css';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ButtonPrimary } from '../buttons';

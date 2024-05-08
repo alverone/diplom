@@ -1,7 +1,7 @@
 'use client';
 
+import styles from '@/app/components/pagination/styles.module.css';
 import { generatePagination } from '@/app/lib/utils';
-import styles from '@/app/ui/pagination/styles.module.css';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';

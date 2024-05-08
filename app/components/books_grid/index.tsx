@@ -1,7 +1,7 @@
 'use client';
 
+import styles from '@/app/components/books_grid/styles.module.css';
 import { BookSimplified } from '@/app/lib/definitions';
-import styles from '@/app/ui/books_grid/styles.module.css';
 import { Suspense } from 'react';
 import BookCard from '../book_card';
 import Pagination from '../pagination';

@@ -1,11 +1,11 @@
 import styles from '@/app/category/[id]/styles.module.css';
+import BooksGrid from '@/app/components/books_grid';
+import NotFoundPlaceholder from '@/app/components/not_found_placeholder';
 import {
   fetchCategoryById,
   fetchSimpleBooksByCategory,
   fetchSimpleBooksCountByCategory,
 } from '@/app/lib/data';
-import BooksGrid from '@/app/ui/books_grid';
-import NotFoundPlaceholder from '@/app/ui/not_found_placeholder';
 
 export default async function Page({
   params,

@@ -1,6 +1,6 @@
 'use client';
 
-import styles from '@/app/ui/nav_link_item/styles.module.css';
+import styles from '@/app/components/nav_link_item/styles.module.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 

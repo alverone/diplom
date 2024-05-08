@@ -1,11 +1,16 @@
-import styles from '@/app/ui/nav/styles.module.css';
-import Search from '@/app/ui/search';
+'use client';
+
+import styles from '@/app/components/nav/styles.module.css';
+import Search from '@/app/components/search';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import NavLinkItem from '../nav_link_item';
 
 export default function Nav() {
+  const { data: session, status } = useSession();
+
   return (
     <nav className={styles.nav}>
       <div className={styles.innerContainer}>
@@ -30,6 +35,7 @@ export default function Nav() {
           <NavLinkItem text="Видавництва" href="/publishers" />
         </ol>
       </div>
+      {session ? <div>Logged in</div> : <div>Log in</div>}
     </nav>
   );
 }

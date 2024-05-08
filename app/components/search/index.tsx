@@ -1,6 +1,6 @@
 'use client';
 
-import styles from '@/app/ui/search/styles.module.css';
+import styles from '@/app/components/search/styles.module.css';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 

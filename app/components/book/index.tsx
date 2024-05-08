@@ -1,6 +1,6 @@
+import styles from '@/app/components/book/styles.module.css';
 import { Book } from '@/app/lib/definitions';
 import { formatCurrency } from '@/app/lib/utils';
-import styles from '@/app/ui/book/styles.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import BookEdition from '../book_edition';
