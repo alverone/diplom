@@ -1,28 +1,31 @@
-import Footer from '@/app/components/footer';
-import styles from '@/app/components/layout.module.css';
-import Nav from '@/app/components/nav';
 import '@/app/globals.css';
-import '@/app/normalize.css';
-import { getServerSession } from 'next-auth';
-import { authOptions } from './api/auth/[...nextauth]/route';
-import SessionProvider from './components/session_provider/SessionProvider';
+import Footer from '@/components/Footer';
+
+import Nav from '@/components/nav';
+import SessionProvider from '@/components/SessionProvider';
+import StoreProvider from '@/components/StoreProvider';
+import { getAuthSession } from '@/lib/auth';
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   return (
     <html lang="en">
-      <body>
+      <StoreProvider>
         <SessionProvider session={session}>
-          <Nav />
-          <div className={styles.rootContainer}>{children}</div>
-          <Footer />
+          <body>
+            <Nav />
+            <div className="flex w-full flex-col items-center justify-center">
+              {children}
+            </div>
+            <Footer />
+          </body>
         </SessionProvider>
-      </body>
+      </StoreProvider>
     </html>
   );
 }

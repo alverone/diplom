@@ -1,6 +1,5 @@
 import { $Enums } from '@prisma/client';
-import { Author, Category, Publisher } from './../app/lib/definitions';
-import prisma from './../app/lib/prisma';
+import prisma from '../lib/prisma';
 
 type AuthorPayload = {
   name: string;

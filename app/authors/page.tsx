@@ -1,5 +1,5 @@
 import styles from '@/app/authors/styles.module.css';
-import { fetchAllAuthors } from '@/app/lib/data';
+import { fetchAllAuthors } from '@/lib/data';
 import Link from 'next/link';
 
 export default async function Page() {

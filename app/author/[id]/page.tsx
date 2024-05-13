@@ -1,30 +1,41 @@
-import styles from '@/app/author/[id]/styles.module.css';
-import BooksGrid from '@/app/components/books_grid';
-import NotFoundPlaceholder from '@/app/components/not_found_placeholder';
+import BooksGrid from '@/components/BooksGrid';
+import LoadingView from '@/components/LoadingView';
+import NotFoundPlaceholder from '@/components/NotFoundPlaceholder';
 import {
   fetchAuthorById,
   fetchSimpleBooksByAuthor,
   fetchSimpleBooksCountByAuthor,
-} from '@/app/lib/data';
+} from '@/lib/data';
+import { Suspense } from 'react';
 
 export default async function Page({
   params,
+  searchParams,
 }: {
-  params: { id: string; page?: string };
+  params: { id: string };
+  searchParams: { page?: string };
 }) {
-  const author = await fetchAuthorById(params.id);
+  const { id } = params;
+  const { page } = searchParams;
+
+  const currentPage = Number(page ?? '1');
+  const author = await fetchAuthorById(id);
 
   if (!author) {
     return <NotFoundPlaceholder />;
   }
 
-  const pageCount = await fetchSimpleBooksCountByAuthor(author.id);
-  const books = await fetchSimpleBooksByAuthor(1, author.id);
+  const [pageCount, books] = await Promise.all([
+    fetchSimpleBooksCountByAuthor(author.id),
+    fetchSimpleBooksByAuthor(currentPage, author.id),
+  ]);
 
   return (
     <main>
-      <h1 className={styles.heading}>{author.name}</h1>
-      <BooksGrid books={books} pagesCount={pageCount ?? 1} />
+      <h1 className="text-3xl font-bold text-neutral-950">{author.name}</h1>
+      <Suspense fallback={<LoadingView />}>
+        <BooksGrid books={books} pagesCount={pageCount} />
+      </Suspense>
     </main>
   );
 }

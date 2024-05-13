@@ -1,5 +1,5 @@
-import { fetchAllPublishers } from '@/app/lib/data';
 import styles from '@/app/publishers/styles.module.css';
+import { fetchAllPublishers } from '@/lib/data';
 import Link from 'next/link';
 
 export default async function Page() {

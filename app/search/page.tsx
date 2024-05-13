@@ -1,9 +1,11 @@
-import BooksGrid from '@/app/components/books_grid';
-import styles from '@/app/search/styles.module.css';
+import BooksGrid from '@/components/BooksGrid';
+import Pagination from '@/components/Pagination';
+
 import {
   fetchSimpleBooksFiltered,
   fetchSimpleFilteredBooksCount,
-} from '../lib/data';
+} from '@/lib/data';
+import { Suspense } from 'react';
 
 export default async function Page({
   searchParams,
@@ -13,12 +15,29 @@ export default async function Page({
   const query = searchParams.query?.trim() ?? '';
   const currentPage = Number(searchParams.page || '1');
 
-  const count = await fetchSimpleFilteredBooksCount(query);
-  const books = await fetchSimpleBooksFiltered(query, currentPage);
+  const [count, books] = await Promise.all([
+    fetchSimpleFilteredBooksCount(query),
+    fetchSimpleBooksFiltered(query, currentPage),
+  ]);
+
+  if (!books || books.length == 0) {
+    return (
+      <>
+        <div className="px-12 py-32">
+          <h2 className="text-center text-xl">
+            За цим пошуковим запитом товарів не знайдено.
+          </h2>
+        </div>
+        <Suspense>
+          <Pagination totalPages={1}></Pagination>
+        </Suspense>
+      </>
+    );
+  }
 
   return (
     <main>
-      <h1 className={styles.heading}>Пошук</h1>
+      <h1 className="text-3xl font-bold text-neutral-950">Пошук</h1>
       <BooksGrid books={books} pagesCount={count ?? 1} />
     </main>
   );

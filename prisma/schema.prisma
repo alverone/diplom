@@ -56,14 +56,14 @@ model Publisher {
 model User {
   id            String    @id @default(cuid())
   name          String
-  surname       String
   email         String    @unique
   emailVerified DateTime?
   image         String?
   createdAt     DateTime  @default(now())
-  
   updatedAt     DateTime  @updatedAt
   password      String
+  surname       String
+  wishesIds     String[]
 }
 
 enum BookType {

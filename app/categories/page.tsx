@@ -1,5 +1,5 @@
 import styles from '@/app/categories/styles.module.css';
-import { fetchAllCategories } from '@/app/lib/data';
+import { fetchAllCategories } from '@/lib/data';
 import Link from 'next/link';
 
 export default async function Page() {
