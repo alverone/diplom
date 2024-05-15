@@ -1,6 +1,5 @@
 import '@/app/globals.css';
 import Footer from '@/components/Footer';
-
 import Nav from '@/components/nav';
 import SessionProvider from '@/components/SessionProvider';
 import StoreProvider from '@/components/StoreProvider';
@@ -15,17 +14,17 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <StoreProvider>
-        <SessionProvider session={session}>
-          <body>
+      <body>
+        <StoreProvider>
+          <SessionProvider session={session}>
             <Nav />
             <div className="flex w-full flex-col items-center justify-center">
               {children}
             </div>
             <Footer />
-          </body>
-        </SessionProvider>
-      </StoreProvider>
+          </SessionProvider>
+        </StoreProvider>
+      </body>
     </html>
   );
 }

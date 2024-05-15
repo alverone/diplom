@@ -7,11 +7,22 @@ import { z } from 'zod';
 import { getAuthSession } from './auth';
 import prisma from './prisma';
 
-const schema = z.object({
+const createSchema = z.object({
   email: z.string().email({ message: 'Невірний email' }),
   password: z
     .string()
     .min(8, { message: 'Пароль повинен містити не менше 8 символів' }),
+  name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+  surname: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+  phone: z
+    .string({
+      required_error: 'Обовʼязкове поле',
+    })
+    .min(1),
+});
+
+const updateSchema = z.object({
+  email: z.string().email({ message: 'Невірний email' }),
   name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
   surname: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
   phone: z
@@ -35,6 +46,19 @@ export interface CreateUserResponse {
     | undefined;
 }
 
+export interface UpdateUserResponse {
+  message?: string;
+  status?: number;
+  errors?:
+    | {
+        email?: string[] | undefined;
+        phone?: string[] | undefined;
+        name?: string[] | undefined;
+        surname?: string[] | undefined;
+      }
+    | undefined;
+}
+
 export async function createUser(fd: FormData): Promise<CreateUserResponse> {
   try {
     const userPayload = {
@@ -45,7 +69,7 @@ export async function createUser(fd: FormData): Promise<CreateUserResponse> {
       phone: fd.get('phone') as string,
     };
 
-    const validatedFields = schema.safeParse(userPayload);
+    const validatedFields = createSchema.safeParse(userPayload);
     if (!validatedFields.success) {
       return {
         status: 400,
@@ -83,11 +107,59 @@ export async function createUser(fd: FormData): Promise<CreateUserResponse> {
         surname: userPayload.surname,
         email: userPayload.email,
         password: hashedPassword,
+        phone: userPayload.phone,
       },
     });
 
     return {
       status: 201,
+      message: 'Ок',
+    };
+  } catch (e) {
+    console.error(e);
+
+    return {
+      status: 500,
+      message: 'Internal server error',
+    };
+  }
+}
+
+export async function updateUser(
+  id: string,
+  fd: FormData,
+): Promise<UpdateUserResponse> {
+  try {
+    const userPayload = {
+      email: fd.get('email') as string,
+      name: fd.get('name') as string,
+      surname: fd.get('surname') as string,
+      phone: fd.get('phone') as string,
+    };
+
+    const validatedFields = updateSchema.safeParse(userPayload);
+    if (!validatedFields.success) {
+      return {
+        status: 400,
+        message: 'Перевірте правильність введених даних',
+        errors: validatedFields.error?.flatten().fieldErrors,
+      };
+    }
+
+    await prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name: userPayload.name,
+        surname: userPayload.surname,
+        email: userPayload.email,
+        phone: userPayload.phone,
+      },
+    });
+
+    return {
+      status: 204,
       message: 'Ок',
     };
   } catch (e) {

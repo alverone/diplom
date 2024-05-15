@@ -65,8 +65,10 @@ declare global {
   interface AppUser {
     id: string;
     name: string | null;
+    surname: string | null;
     email: string;
     emailVerified: Date | null;
+    phone: string | null;
     image: string | null;
     createdAt: Date;
     updatedAt: Date;

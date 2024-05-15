@@ -11,7 +11,7 @@ export default function BookCard({ book }: { book: BookSimplified }) {
       <div className="flex flex-col items-center justify-center">
         <Image
           key={book.id}
-          className="fit-contain xs:max-h-64 xs:max-w-64 aspect-square h-auto max-h-96 w-full max-w-96 object-contain"
+          className="fit-contain aspect-square h-auto max-h-96 w-full max-w-96 object-contain xs:max-h-64 xs:max-w-64"
           src={`/books/${book.id}.jpg`}
           alt={book.title}
           width={256}
@@ -19,7 +19,9 @@ export default function BookCard({ book }: { book: BookSimplified }) {
           priority={true}
         />
         <div className="flex w-full flex-col items-start p-3">
-          <p className="text-xl font-semibold text-neutral-950">{book.title}</p>
+          <p className="text-lg font-semibold text-neutral-950 lg:text-xl">
+            {book.title}
+          </p>
           <p className="mt-1 text-base font-medium text-neutral-800">
             {book.author.name}
           </p>

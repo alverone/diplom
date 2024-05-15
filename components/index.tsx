@@ -62,7 +62,10 @@ function LoginModal({ onModalClosed }: { onModalClosed: () => void }) {
               onModalClosed={onModalClosed}
             />
           ) : (
-            <RegistrationForm onFormChanged={setIsLogin} />
+            <RegistrationForm
+              onFormChanged={setIsLogin}
+              onModalClosed={onModalClosed}
+            />
           )}
         </div>
       </div>
@@ -164,8 +167,10 @@ function LoginForm({
 
 function RegistrationForm({
   onFormChanged,
+  onModalClosed,
 }: {
   onFormChanged: (arg0: boolean) => void;
+  onModalClosed: () => void;
 }) {
   const [formState, setFormState] = useState<CreateUserResponse>({});
 

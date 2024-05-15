@@ -2,7 +2,7 @@ import BooksGrid from '@/components/BooksGrid';
 import LoadingView from '@/components/LoadingView';
 import { getAuthSession } from '@/lib/auth';
 import { fetchWishedBooks, fetchWishedBooksCount } from '@/lib/data';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 export default async function Page({ searchParams }: PaginatedSearchParams) {
@@ -16,7 +16,9 @@ export default async function Page({ searchParams }: PaginatedSearchParams) {
     fetchWishedBooks(currentPage, userId),
   ]);
 
-  console.log(Date.now(), currentPage);
+  if (currentPage > pageCount) {
+    redirect('/account/wishlist');
+  }
 
   if (!books || books.length == 0) {
     notFound();
@@ -24,6 +26,9 @@ export default async function Page({ searchParams }: PaginatedSearchParams) {
 
   return (
     <Suspense fallback={<LoadingView />} key={`wishlist/${currentPage}`}>
+      <h2 className="text-lg font-semibold text-neutral-950 xs:text-xl md:hidden">
+        Мій кабінет | Список обраного
+      </h2>
       <BooksGrid books={books} pagesCount={pageCount} />
     </Suspense>
   );
