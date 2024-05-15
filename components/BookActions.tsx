@@ -17,7 +17,9 @@ export default function BookActions({
   wishesIds: string[];
 }) {
   const dispatch = useAppDispatch();
-  const booksInCheckout = useAppSelector((state) => state.checkout.books);
+  const booksInCheckout = useAppSelector(
+    (state) => state.reducer.checkout.books,
+  );
   const { data: session } = useSession();
   const [isWishing, setIsWishing] = useState(false);
 
