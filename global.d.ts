@@ -1,4 +1,4 @@
-import { $Enums } from '@prisma/client';
+import { $Enums, OrderStatus } from '@prisma/client';
 import { DefaultSession, ISODateString, User } from 'next-auth';
 import { AdapterUser } from 'next-auth/adapters';
 
@@ -70,6 +70,16 @@ declare global {
     emailVerified: Date | null;
     phone: string | null;
     image: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }
+
+  interface Order {
+    id: number;
+    bookIds: string[];
+    price: number;
+    userId: string;
+    status: OrderStatus;
     createdAt: Date;
     updatedAt: Date;
   }

@@ -316,6 +316,45 @@ export async function fetchBookPagesCount() {
   }
 }
 
+export async function fetchOrdersPagesCount(userId: string) {
+  try {
+    const orderCount = await prisma?.order.count({
+      where: { userId: userId },
+    });
+
+    const numberOfPages = Number(orderCount ?? '0') / 10;
+
+    return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
+  } catch (e) {
+    console.error('DatabaseError:', e);
+    return 1;
+  }
+}
+
+export async function fetchOrders(currentPage: number, userId: string) {
+  try {
+    const limit = 10;
+    const offset = (currentPage - 1) * limit;
+
+    const orders = await prisma?.order.findMany({
+      where: { userId: userId },
+      take: limit,
+      skip: offset,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!orders) {
+      return [];
+    } else {
+      return orders as Order[];
+    }
+  } catch (e) {
+    console.error('DatabaseError:', e);
+
+    return [];
+  }
+}
+
 //FIXME:
 export async function fetchSimpleBooksFiltered(
   term: string,

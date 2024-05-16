@@ -42,7 +42,7 @@ export default async function AccountLayout({
         <ProfileTab text="Вихід" href="/signout" />
       </div>
 
-      <main className="w-full justify-stretch">{children}</main>
+      <main className="w-full justify-stretch p-0 xs:p-6">{children}</main>
     </div>
   );
 }

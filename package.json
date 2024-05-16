@@ -2,13 +2,13 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "clear": "node -r dotenv/config ./scripts/clear.js",
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
     "prettier": "prettier --write --ignore-unknown .",
     "prettier:check": "prettier --check --ignore-unknown .",
-    "start": "next start"
+    "start": "next start",
+    "studio": "prisma studio --browser none"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",

@@ -58,16 +58,39 @@ model User {
   name          String
   email         String    @unique
   emailVerified DateTime?
-  phone         String
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   password      String
   surname       String
   wishesIds     String[]
+  phone         String
+  orderIds      String[]
+  orders        Order[]
+}
+
+model Order {
+  id        Int      @id @default(autoincrement())
+  price     Float
+  status    OrderStatus
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  userId    String      @map("user_id")
+  bookIds   String[]    @map("book_ids")
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("orders")
 }
 
 enum BookType {
   ELECTRONIC
   PAPER
+}
+
+enum OrderStatus {
+  CREATED
+  ACCEPTED
+  PROCESSING
+  SHIPPED
+  COMPLETED
 }
