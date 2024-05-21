@@ -36,8 +36,8 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
           return (
             <PaginationNumber
               key={page === '...' ? index : page}
-              href={createPageURL(page)}
-              page={page}
+              href={createPageURL(page ?? '...')}
+              page={page ?? '...'}
               position={position}
               isActive={page !== '...' && currentPage === page}
             />

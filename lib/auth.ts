@@ -2,7 +2,6 @@ import { compare } from 'bcrypt';
 import { getServerSession, NextAuthOptions } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import GitHubProvider from 'next-auth/providers/github';
 import prisma from './prisma';
 
 const authOptions: NextAuthOptions = {
@@ -10,10 +9,6 @@ const authOptions: NextAuthOptions = {
     strategy: 'jwt',
   },
   providers: [
-    GitHubProvider({
-      clientId: process.env.GITHUB_ID ?? '',
-      clientSecret: process.env.GITHUB_SECRET ?? '',
-    }),
     CredentialsProvider({
       name: 'Sign in',
       credentials: {

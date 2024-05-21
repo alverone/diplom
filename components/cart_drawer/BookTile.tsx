@@ -56,7 +56,7 @@ export default function BookTile({
         </a>
         <input
           type="number"
-          className="w-12 min-w-12 max-w-12 rounded-md border-2 border-solid border-orange-300 p-0 text-center text-center text-base text-slate-950 transition-colors duration-200 ease-in-out focus:border-orange-400 focus:outline-none"
+          className="w-12 min-w-12 max-w-12 rounded-md border-2 border-solid border-orange-300 p-0 text-center text-base text-slate-950 transition-colors duration-200 ease-in-out focus:border-orange-400 focus:outline-none"
           value={count}
           readOnly
         />

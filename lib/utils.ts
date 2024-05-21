@@ -73,7 +73,7 @@ export function generatePagination(
   numPagesAtEdges = 1,
   numPagesAroundCurrent = 1,
   glue = '…',
-) {
+): (string | number)[] {
   const numItemsInSequence =
     1 + numPagesAroundCurrent * 2 + numPagesAtEdges * 2 + 2;
   const reworkedCurPage = Math.min(curPage, numPages);
@@ -136,7 +136,7 @@ export function generatePagination(
 
     finalSequence = Object.values(sequence)
       .filter((v) => v !== null)
-      .flat();
+      .flat() as (string | number)[];
   }
 
   return finalSequence;
