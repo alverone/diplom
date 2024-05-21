@@ -25,6 +25,7 @@ export async function POST(req: Request) {
         id: true,
         type: true,
         price: true,
+        coverUrl: true,
         authorId: true,
         author: true,
         title: true,

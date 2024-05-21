@@ -52,6 +52,7 @@ const authOptions: NextAuthOptions = {
           name: user.name,
           surname: user.surname,
           phone: user.phone,
+          role: user.role,
         } as AppSessionUser;
       },
     }),
@@ -65,6 +66,7 @@ const authOptions: NextAuthOptions = {
           id: appUser.id,
           surname: appUser.surname,
           phone: appUser.phone,
+          role: appUser.role,
         };
       } else {
         return token;
@@ -79,6 +81,7 @@ const authOptions: NextAuthOptions = {
             id: token.id,
             surname: token.surname,
             phone: token.phone,
+            role: token.role,
           },
         };
       } else {

@@ -1,4 +1,4 @@
-import { $Enums, OrderStatus } from '@prisma/client';
+import { $Enums, OrderStatus, UserRole } from '@prisma/client';
 import { DefaultSession, ISODateString, User } from 'next-auth';
 import { AdapterUser } from 'next-auth/adapters';
 
@@ -28,6 +28,7 @@ declare global {
     type: string;
     price: number;
     title: string;
+    coverUrl: string | null;
     author_name: string;
     author_id: string;
     author_description: string | null;
@@ -38,7 +39,7 @@ declare global {
     price: number;
     title: string;
     type: BookType;
-
+    coverUrl: string | null;
     authorId: string;
     author: Author;
   }
@@ -51,6 +52,7 @@ declare global {
     publishDate: Date;
     pageLength: number;
     type: BookType;
+    coverUrl: string | null;
 
     category: Category;
     categoryId: string;
@@ -88,12 +90,14 @@ declare global {
     id: string;
     surname: string | null;
     phone: string | null;
+    role: UserRole;
   }
 
   interface AppAdapterUser extends AdapterUser {
     id: string;
     phone: string | null;
     surname: string | null;
+    role: UserRole;
   }
 
   interface AppSession extends DefaultSession {

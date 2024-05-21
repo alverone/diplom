@@ -29,7 +29,7 @@ export default function BookTile({
       <Image
         width="64"
         height="64"
-        src={`/books/${book.id}.jpg`}
+        src={book.coverUrl ?? 'images/placeholder_book.jpg'}
         alt=""
         className="self-center"
       />

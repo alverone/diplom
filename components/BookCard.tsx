@@ -12,7 +12,7 @@ export default function BookCard({ book }: { book: BookSimplified }) {
         <Image
           key={book.id}
           className="fit-contain aspect-square h-auto max-h-96 w-full max-w-96 object-contain xs:max-h-64 xs:max-w-64"
-          src={`/books/${book.id}.jpg`}
+          src={book.coverUrl ?? 'images/placeholder_book.jpg'}
           alt={book.title}
           width={256}
           height={256}

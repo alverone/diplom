@@ -22,6 +22,7 @@ model Book {
   author      Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   publisher   Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+  coverUrl    String?   @map("cover_url")
 
   @@map("books")
 }
@@ -67,6 +68,7 @@ model User {
   phone         String
   orderIds      String[]
   orders        Order[]
+  role UserRole @default(USER)
 }
 
 model Order {
@@ -88,6 +90,12 @@ model Order {
   user      User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("orders")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  EDITOR
 }
 
 enum BookType {
