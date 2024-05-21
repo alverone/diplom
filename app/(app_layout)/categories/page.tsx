@@ -1,6 +1,6 @@
-import styles from '@/app/categories/styles.module.css';
 import { fetchAllCategories } from '@/lib/data';
 import Link from 'next/link';
+import styles from './styles.module.css';
 
 export default async function Page() {
   const categories = await fetchAllCategories();
