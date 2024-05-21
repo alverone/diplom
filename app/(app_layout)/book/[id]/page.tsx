@@ -34,7 +34,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         <div className="flex w-full max-w-[1248px] flex-col items-start justify-center gap-y-6 py-4 text-base text-neutral-950 md:flex-row md:gap-x-6 md:py-6 lg:gap-x-12 lg:py-12">
           <Image
             className="w-full grow-0 md:w-auto md:min-w-72 md:max-w-[30vw] lg:min-w-96"
-            src={`/books/${book.id}.jpg`}
+            src={book.coverUrl ?? 'images/placeholder_book.jpg'}
             alt={book.title}
             width={580}
             height={915}
