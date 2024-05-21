@@ -1,14 +1,14 @@
 import UserInfoForm from '@/components/forms/UserInfoForm';
 import LoadingView from '@/components/LoadingView';
 
-import { getAuthSession } from '@/lib/auth';
+import { getAppSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { signOut } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 export default async function Page() {
-  const session = await getAuthSession();
+  const session = await getAppSession();
 
   if (!session || !session.user) {
     redirect('/');

@@ -1,3 +1,4 @@
+import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import type { AppDispatch, AppStore, RootState } from './store';
@@ -30,4 +31,10 @@ export function useWindowDimensions() {
   }, []);
 
   return windowDimensions;
+}
+
+export function useAppSession() {
+  const { data: session, status } = useSession();
+
+  return { session: session as AppSession | null, status: status };
 }

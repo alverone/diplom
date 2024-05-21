@@ -32,6 +32,7 @@ export default function AppInput({
             mask={mask}
             alwaysShowMask={true}
             className={inputClass}
+            defaultValue={rest.defaultValue}
             {...rest}
           />
         )) || <input className={inputClass} {...rest} />}
@@ -48,6 +49,7 @@ export default function AppInput({
           mask={mask}
           alwaysShowMask={true}
           className={inputClass}
+          defaultValue={rest.defaultValue}
           {...rest}
         />
       )) || <input className={inputClass} {...rest} />}

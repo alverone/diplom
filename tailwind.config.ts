@@ -8,6 +8,7 @@ export default {
   theme: {
     extend: {
       screens: {
+        laptop: '991px',
         xs: '480px',
       },
     },

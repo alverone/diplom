@@ -1,5 +1,5 @@
 import ProfileTab from '@/components/ProfileTab';
-import { getAuthSession } from '@/lib/auth';
+import { getAppSession } from '@/lib/auth';
 import {
   ArchiveBoxIcon,
   HeartIcon,
@@ -12,7 +12,7 @@ export default async function AccountLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getAuthSession();
+  const session = await getAppSession();
 
   if (!session) {
     redirect('/', RedirectType.replace);

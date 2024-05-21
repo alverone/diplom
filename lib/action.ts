@@ -4,7 +4,8 @@ import { hashSync } from 'bcrypt';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
-import { getAuthSession } from './auth';
+import { OrderStatus } from '@prisma/client';
+import { getAppSession } from './auth';
 import prisma from './prisma';
 
 const createSchema = z.object({
@@ -32,34 +33,50 @@ const updateSchema = z.object({
     .min(1),
 });
 
-export interface CreateUserResponse {
+const makeOrderSchema = z.object({
+  email: z.string().email({ message: 'Невірний email' }),
+  name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+  surname: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+  phone: z
+    .string({
+      required_error: 'Обовʼязкове поле',
+    })
+    .min(1),
+  address: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+});
+
+export interface ActionResponse<T> {
   message?: string;
   status?: number;
-  errors?:
-    | {
-        email?: string[] | undefined;
-        password?: string[] | undefined;
-        phone?: string[] | undefined;
-        name?: string[] | undefined;
-        surname?: string[] | undefined;
-      }
-    | undefined;
+  errors?: T | undefined;
 }
 
-export interface UpdateUserResponse {
-  message?: string;
-  status?: number;
-  errors?:
-    | {
-        email?: string[] | undefined;
-        phone?: string[] | undefined;
-        name?: string[] | undefined;
-        surname?: string[] | undefined;
-      }
-    | undefined;
+export interface CreateUserErrors {
+  email?: string[] | undefined;
+  password?: string[] | undefined;
+  phone?: string[] | undefined;
+  name?: string[] | undefined;
+  surname?: string[] | undefined;
 }
 
-export async function createUser(fd: FormData): Promise<CreateUserResponse> {
+export interface UpdateUserErrors {
+  email?: string[] | undefined;
+  phone?: string[] | undefined;
+  name?: string[] | undefined;
+  surname?: string[] | undefined;
+}
+
+export interface MakeOrderErrors {
+  name?: string[] | undefined;
+  surname?: string[] | undefined;
+  phone?: string[] | undefined;
+  email?: string[] | undefined;
+  address?: string[] | undefined;
+}
+
+export async function createUser(
+  fd: FormData,
+): Promise<ActionResponse<CreateUserErrors>> {
   try {
     const userPayload = {
       email: fd.get('email') as string,
@@ -99,15 +116,15 @@ export async function createUser(fd: FormData): Promise<CreateUserResponse> {
       };
     }
 
-    const hashedPassword = hashSync(userPayload.password, 12);
+    const hashedPassword = hashSync(userPayload.password.trim(), 12);
 
     await prisma.user.create({
       data: {
-        name: userPayload.name,
-        surname: userPayload.surname,
-        email: userPayload.email,
+        name: userPayload.name.trim(),
+        surname: userPayload.surname.trim(),
+        email: userPayload.email.trim(),
         password: hashedPassword,
-        phone: userPayload.phone,
+        phone: userPayload.phone.trim(),
       },
     });
 
@@ -128,7 +145,7 @@ export async function createUser(fd: FormData): Promise<CreateUserResponse> {
 export async function updateUser(
   id: string,
   fd: FormData,
-): Promise<UpdateUserResponse> {
+): Promise<ActionResponse<UpdateUserErrors>> {
   try {
     const userPayload = {
       email: fd.get('email') as string,
@@ -151,10 +168,10 @@ export async function updateUser(
         id: id,
       },
       data: {
-        name: userPayload.name,
-        surname: userPayload.surname,
-        email: userPayload.email,
-        phone: userPayload.phone,
+        name: userPayload.name.trim(),
+        surname: userPayload.surname.trim(),
+        email: userPayload.email.trim(),
+        phone: userPayload.phone.trim(),
       },
     });
 
@@ -176,7 +193,7 @@ export async function updateUser(
 
 export async function addBookToWishes(bookId: string): Promise<boolean> {
   try {
-    const session = await getAuthSession();
+    const session = await getAppSession();
     const currentUserId = session?.user?.id ?? '';
 
     if (currentUserId == null || bookId.length === 0) {
@@ -233,7 +250,7 @@ export async function addBookToWishes(bookId: string): Promise<boolean> {
 
 export async function removeBookFromWishes(bookId: string): Promise<boolean> {
   try {
-    const session = await getAuthSession();
+    const session = await getAppSession();
     const currentUserId = session?.user?.id ?? '';
 
     if (currentUserId == null || bookId.length === 0) {
@@ -287,5 +304,82 @@ export async function removeBookFromWishes(bookId: string): Promise<boolean> {
     console.error(e);
 
     return false;
+  }
+}
+
+export async function createOrder(
+  userId: string | null | undefined,
+  order: BookAndCount[],
+  fd: FormData,
+): Promise<ActionResponse<MakeOrderErrors>> {
+  try {
+    const userPayload = {
+      email: fd.get('email') as string,
+      address: fd.get('address') as string,
+      name: fd.get('name') as string,
+      surname: fd.get('surname') as string,
+      phone: fd.get('phone') as string,
+      description: fd.get('description') as string,
+    };
+
+    const validatedFields = makeOrderSchema.safeParse(userPayload);
+    if (!validatedFields.success) {
+      return {
+        status: 400,
+        message: 'Перевірте правильність введених даних',
+        errors: validatedFields.error?.flatten().fieldErrors,
+      };
+    }
+
+    const bookIds = order.map((item) => item.id);
+    const bookPrices = await prisma.book.findMany({
+      where: {
+        id: {
+          in: bookIds,
+        },
+      },
+      select: {
+        id: true,
+        price: true,
+      },
+    });
+
+    if (!bookPrices || bookPrices.length === 0) {
+      throw new Error('Internal server error');
+    }
+
+    const resultPrice = bookPrices.reduce(
+      (acc, book) =>
+        acc +
+        book.price * (order.find((inner) => book.id == inner.id)?.count ?? 1),
+      0,
+    );
+    const fullName = `${userPayload.name.trim()} ${userPayload.surname.trim()}`;
+
+    await prisma.order.create({
+      data: {
+        fullName: fullName,
+        email: userPayload.email,
+        phone: userPayload.phone,
+        address: userPayload.address.trim(),
+        userId: userId ?? undefined,
+        price: resultPrice,
+        status: OrderStatus.CREATED,
+        description: userPayload.description,
+        bookIds: bookIds,
+      },
+    });
+
+    return {
+      status: 201,
+      message: 'Ок',
+    };
+  } catch (e) {
+    console.error(e);
+
+    return {
+      status: 500,
+      message: 'Internal server error',
+    };
   }
 }

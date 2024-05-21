@@ -2,6 +2,7 @@
 
 import { toggleCart } from '@/lib/features/drawers/drawers_slice';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { ButtonPrimary } from '../Buttons';
 import CrossIcon from '../CrossIcon';
@@ -10,6 +11,7 @@ import BookTile from './BookTile';
 import EmptyView from './EmptyView';
 
 export default function CartDrawer() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { books } = useAppSelector((state) => state.reducer.checkout);
 
@@ -40,32 +42,31 @@ export default function CartDrawer() {
       0,
     ) ?? 0;
 
+  const closeCart = () => dispatch(toggleCart(false));
+
   return (
     <div className="flex h-full w-screen max-w-[512px] flex-col bg-neutral-100">
       <div className="align-center flex w-full grow-0 flex-row justify-between gap-x-6 bg-white px-6 py-4">
         <h2 className="text-2xl font-bold text-neutral-950">Кошик</h2>
-        <CrossIcon
-          className="p-1"
-          width={24}
-          height={24}
-          onClick={() => dispatch(toggleCart(false))}
-        />
+        <CrossIcon className="p-1" width={24} height={24} onClick={closeCart} />
       </div>
 
       <div className="h-full w-full grow overflow-y-scroll p-6">
         <Suspense fallback={<LoadingView />}>
           {loadedBooks === null && <LoadingView />}
-          {(loadedBooks?.length ?? 0) > 0 &&
-            loadedBooks!.map((book) => (
-              <BookTile
-                key={book.id}
-                book={book}
-                count={books.find((b) => b.id == book.id)?.count ?? 1}
-              />
-            ))}
-          {loadedBooks?.length == 0 && (
-            <EmptyView onBtnClicked={() => dispatch(toggleCart(false))} />
+          {(loadedBooks?.length ?? 0) > 0 && (
+            <div className="flex h-full max-h-full flex-col gap-y-5">
+              {loadedBooks!.map((book, index) => (
+                <BookTile
+                  key={book.id}
+                  book={book}
+                  count={books.find((b) => b.id == book.id)?.count ?? 1}
+                  includeBorder={index !== loadedBooks!.length - 1}
+                />
+              ))}
+            </div>
           )}
+          {loadedBooks?.length == 0 && <EmptyView onBtnClicked={closeCart} />}
         </Suspense>
       </div>
 
@@ -81,7 +82,10 @@ export default function CartDrawer() {
           </div>
           <ButtonPrimary
             label="Оформити замовлення"
-            onClick={function () {}}
+            onClick={() => {
+              router.push('/checkout');
+              closeCart();
+            }}
             fullWidth={true}
           />
         </div>

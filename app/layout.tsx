@@ -1,28 +1,24 @@
 import '@/app/globals.css';
-import Footer from '@/components/Footer';
-import Nav from '@/components/nav/Nav';
+import Drawers from '@/components/Drawers';
 
 import SessionProvider from '@/components/SessionProvider';
 import StoreProvider from '@/components/StoreProvider';
-import { getAuthSession } from '@/lib/auth';
+import { getAppSession } from '@/lib/auth';
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getAuthSession();
+  const session = await getAppSession();
 
   return (
     <html lang="en">
       <body>
         <StoreProvider>
           <SessionProvider session={session}>
-            <Nav />
-            <div className="flex w-full flex-col items-center justify-center">
-              {children}
-            </div>
-            <Footer />
+            {children}
+            <Drawers />
           </SessionProvider>
         </StoreProvider>
       </body>

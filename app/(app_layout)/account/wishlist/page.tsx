@@ -1,6 +1,6 @@
 import BooksGrid from '@/components/BooksGrid';
 import LoadingView from '@/components/LoadingView';
-import { getAuthSession } from '@/lib/auth';
+import { getAppSession } from '@/lib/auth';
 import { fetchWishedBooks, fetchWishedBooksCount } from '@/lib/data';
 import { sortOrderFromString } from '@/lib/utils';
 import { notFound, redirect } from 'next/navigation';
@@ -9,7 +9,7 @@ import { Suspense } from 'react';
 export default async function Page({ searchParams }: PaginatedSearchParams) {
   const { page, sortOrder } = searchParams;
   const currentPage = Number(page ?? '1');
-  const session = await getAuthSession();
+  const session = await getAppSession();
   const userId = session?.user?.id ?? '';
 
   const [pageCount, books] = await Promise.all([

@@ -1,10 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type BookAndCount = {
-  id: string;
-  count: number;
-};
-
 type CheckoutSliceState = {
   books: BookAndCount[];
 };
@@ -44,10 +39,18 @@ export const checkoutSlice = createSlice({
 
       state.books = [...state.books].filter((book) => book.id !== bookId);
     },
+    clearCart: (state) => {
+      state.books = [];
+    },
   },
 });
 
-export const { addBook, incrementBookCount, decrementBookCount, removeBook } =
-  checkoutSlice.actions;
+export const {
+  addBook,
+  incrementBookCount,
+  decrementBookCount,
+  removeBook,
+  clearCart,
+} = checkoutSlice.actions;
 
 export default checkoutSlice.reducer;

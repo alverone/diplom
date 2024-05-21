@@ -16,7 +16,7 @@ function openModal(
   setModalOpen(true);
 }
 
-export default function closeModal(
+function closeModal(
   modalName: string,
   searchParams: URLSearchParams,
   pathname: String,

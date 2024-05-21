@@ -1,6 +1,5 @@
 import { compare } from 'bcrypt';
 import { getServerSession, NextAuthOptions } from 'next-auth';
-import { JWT } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import prisma from './prisma';
 
@@ -51,21 +50,22 @@ const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
-          wishesIds: user.wishesIds,
+          surname: user.surname,
+          phone: user.phone,
         } as AppSessionUser;
       },
     }),
   ],
   callbacks: {
-    jwt: ({
-      token,
-      user,
-    }: {
-      token: JWT;
-      user: AppSessionUser | AppAdapterUser;
-    }) => {
+    jwt: ({ token, user }) => {
       if (user) {
-        return { ...token, id: user.id };
+        const appUser = user as AppSessionUser | AppAdapterUser;
+        return {
+          ...token,
+          id: appUser.id,
+          surname: appUser.surname,
+          phone: appUser.phone,
+        };
       } else {
         return token;
       }
@@ -74,7 +74,12 @@ const authOptions: NextAuthOptions = {
       if (token) {
         return {
           ...session,
-          user: { ...session.user, id: token.id },
+          user: {
+            ...session.user,
+            id: token.id,
+            surname: token.surname,
+            phone: token.phone,
+          },
         };
       } else {
         return session;
@@ -83,10 +88,10 @@ const authOptions: NextAuthOptions = {
   },
 };
 
-async function getAuthSession(): Promise<AppSession | null> {
+async function getAppSession(): Promise<AppSession | null> {
   const session = await getServerSession(authOptions);
 
   return session ? (session as AppSession) : null;
 }
 
-export { authOptions, getAuthSession };
+export { authOptions, getAppSession };

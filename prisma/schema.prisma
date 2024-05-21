@@ -70,14 +70,22 @@ model User {
 }
 
 model Order {
-  id        Int      @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   price     Float
+  bookIds   String[]    @map("book_ids")
   status    OrderStatus
+
+  fullName  String      @map("full_name")
+  email     String
+  phone     String
+  address   String
+  description String?
+
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
-  userId    String      @map("user_id")
-  bookIds   String[]    @map("book_ids")
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userId    String?     @map("user_id")
+  user      User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("orders")
 }

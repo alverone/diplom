@@ -1,14 +1,15 @@
 'use client';
 
-import { toggleCart, toggleNav } from '@/lib/features/drawers/drawers_slice';
-import { useAppDispatch, useWindowDimensions } from '@/lib/hooks';
-import { ShoppingCartIcon, UserIcon } from '@heroicons/react/24/outline';
+import { toggleNav } from '@/lib/features/drawers/drawers_slice';
+import { useWindowDimensions } from '@/lib/hooks';
+import { UserIcon } from '@heroicons/react/24/outline';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { ButtonTertiary } from '../Buttons';
+import { useDispatch } from 'react-redux';
+import { ButtonPrimary } from '../Buttons';
 import LoginForm from '../forms/LoginForm';
 import RegistrationForm from '../forms/RegistrationForm';
 import {
@@ -16,12 +17,11 @@ import {
   GenericModalWrapper,
   openModal,
 } from '../GenericModalWrapper';
-import SearchView from './SearchView';
 
 const loginModalParamName = 'showLoginModal';
 
-export default function Nav() {
-  const dispatch = useAppDispatch();
+export default function CheckoutNav() {
+  const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -34,8 +34,6 @@ export default function Nav() {
   );
   const showLoginModal = searchParams.get(loginModalParamName);
   const [isModalOpen, setModalOpen] = useState(Boolean(showLoginModal));
-
-  const showBtnLabels = windowWidth > 768 || windowWidth < 480;
 
   useEffect(() => {
     if (session && showLoginModal) {
@@ -78,37 +76,27 @@ export default function Nav() {
     );
   };
 
-  /*
-<ol>
-  <NavLinkItem text="Автори" href="/authors" />
-  <NavLinkItem text="Категорії" href="/categories" />
-  <NavLinkItem text="Видавництва" href="/publishers" />
-</ol>
-*/
-
   return (
     <>
       <nav className="md:p-y-6 md:p-x-9 top-0 mb-4 flex w-screen flex-col items-center justify-center gap-y-3 p-3 md:mb-6 md:gap-y-6">
-        <div className="flex w-full max-w-[1248px] flex-row flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <div className="flex w-full max-w-[1248px] flex-row flex-wrap items-center justify-between gap-x-4 gap-y-3 border-b-[1px] border-orange-400/25 pb-3">
           <Link href="/" className="min-w-[100px]">
             <Image src="/logo.svg" width={100} height={41.4} alt="" />
           </Link>
 
-          <SearchView placeholder="Пошук..." />
+          <h1 className="invisible hidden text-center text-xl font-bold text-neutral-800 sm:visible sm:inline-block md:text-2xl">
+            Оформлення замовлення
+          </h1>
 
-          <div className="flex basis-full flex-row justify-end gap-x-2 xs:basis-auto xs:justify-start">
-            <ButtonTertiary
-              icon={<ShoppingCartIcon width={20} height={20} />}
-              label={showBtnLabels ? 'Кошик' : null}
-              onClick={() => dispatch(toggleCart(true))}
-            />
-            <ButtonTertiary
-              icon={<UserIcon width={20} height={20} />}
-              label={showBtnLabels ? (session ? 'Кабінет' : 'Увійти') : null}
-              onClick={onLoginBtnClick}
-            />
-          </div>
+          <ButtonPrimary
+            icon={<UserIcon width={20} height={20} />}
+            label={session ? 'Кабінет' : 'Увійти'}
+            onClick={onLoginBtnClick}
+          />
         </div>
+        <h1 className="visible inline-block text-center text-2xl font-bold text-neutral-800 sm:invisible sm:hidden">
+          Оформлення замовлення
+        </h1>
       </nav>
       {isModalOpen && (
         <GenericModalWrapper onModalClosed={onLoginModalClosed}>

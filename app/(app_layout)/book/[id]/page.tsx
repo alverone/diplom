@@ -1,6 +1,6 @@
 import BookActions from '@/components/BookActions';
 import BookEdition from '@/components/BookEdition';
-import { getAuthSession } from '@/lib/auth';
+import { getAppSession } from '@/lib/auth';
 import { fetchBookById } from '@/lib/data';
 import prisma from '@/lib/prisma';
 import { formatCurrency } from '@/lib/utils';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const session = await getAuthSession();
+  const session = await getAppSession();
 
   const userId = session?.user?.id ?? '';
   const bookId = params.id;

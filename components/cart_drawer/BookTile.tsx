@@ -14,14 +14,18 @@ import CrossIcon from '../CrossIcon';
 export default function BookTile({
   book,
   count,
+  includeBorder = true,
 }: {
   book: BookSimplified;
   count: number;
+  includeBorder?: boolean;
 }) {
   const dispatch = useAppDispatch();
 
   return (
-    <div className="relative mb-5 flex flex-row items-center gap-x-2 border-b-2 border-neutral-200 pb-5">
+    <div
+      className={`relative flex flex-row items-center gap-x-4 ${includeBorder ? 'border-b-2 border-neutral-200 pb-5' : ''}`}
+    >
       <Image
         width="64"
         height="64"
@@ -46,7 +50,7 @@ export default function BookTile({
           </span>
         </span>
       </div>
-      <div className="align-end flex h-full flex-row items-center justify-center gap-x-0.5 self-end">
+      <div className="align-end flex flex-row items-center justify-center gap-x-0.5 self-end pb-2">
         <a
           href="#"
           className="inline text-sm leading-none"
@@ -55,8 +59,8 @@ export default function BookTile({
           <MinusIcon width={20} height={20} />
         </a>
         <input
-          type="number"
-          className="w-12 min-w-12 max-w-12 rounded-md border-2 border-solid border-orange-300 p-0 text-center text-base text-slate-950 transition-colors duration-200 ease-in-out focus:border-orange-400 focus:outline-none"
+          type="text"
+          className="w-12 min-w-12 max-w-12 rounded-md border-2 border-solid border-orange-300 px-1 text-center text-base font-medium text-neutral-600 transition-colors duration-200 ease-in-out focus:border-orange-400 focus:outline-none"
           value={count}
           readOnly
         />

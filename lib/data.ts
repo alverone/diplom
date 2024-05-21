@@ -397,7 +397,6 @@ export async function fetchOrders(currentPage: number, userId: string) {
   }
 }
 
-//FIXME:
 export async function fetchSimpleBooksFiltered(
   term: string,
   currentPage: number,
@@ -454,7 +453,6 @@ export async function fetchSimpleBooksFiltered(
   }
 }
 
-//FIXME:
 export async function fetchSimpleFilteredBooksCount(term: string) {
   try {
     const q = `%${term}%`;

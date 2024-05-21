@@ -1,6 +1,6 @@
 'use client';
 
-import { CreateUserResponse, createUser } from '@/lib/action';
+import { ActionResponse, createUser, CreateUserErrors } from '@/lib/action';
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import AppInput from '../AppInput';
@@ -11,7 +11,9 @@ export default function RegistrationForm({
 }: {
   onFormChanged: (arg0: boolean) => void;
 }) {
-  const [formState, setFormState] = useState<CreateUserResponse>({});
+  const [formState, setFormState] = useState<ActionResponse<CreateUserErrors>>(
+    {},
+  );
 
   async function action(fd: FormData) {
     const res = await createUser(fd);

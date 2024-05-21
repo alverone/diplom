@@ -10,9 +10,11 @@ import { ButtonPrimary } from '../Buttons';
 export default function LoginForm({
   onFormChanged,
   onModalClosed,
+  onLogin,
 }: {
   onFormChanged: (arg0: boolean) => void;
   onModalClosed: () => void;
+  onLogin?: () => void;
 }) {
   const router = useRouter();
   const [pending, setIsPending] = useState(false);
@@ -44,6 +46,7 @@ export default function LoginForm({
       setErrorMessage(null);
       onModalClosed();
       router.refresh();
+      onLogin && onLogin();
     } else {
       setErrorMessage('Перевірте правильність введених даних');
     }

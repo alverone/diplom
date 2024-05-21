@@ -86,11 +86,14 @@ declare global {
 
   interface AppSessionUser extends User {
     id: string;
+    surname: string | null;
+    phone: string | null;
   }
 
   interface AppAdapterUser extends AdapterUser {
     id: string;
-    wishesIds?: string[];
+    phone: string | null;
+    surname: string | null;
   }
 
   interface AppSession extends DefaultSession {
@@ -101,4 +104,9 @@ declare global {
   interface PaginatedSearchParams {
     searchParams: { page?: string; sortOrder?: string };
   }
+
+  type BookAndCount = {
+    id: string;
+    count: number;
+  };
 }
