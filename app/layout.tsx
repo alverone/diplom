@@ -1,6 +1,7 @@
 import '@/app/globals.css';
 import Footer from '@/components/Footer';
-import Nav from '@/components/nav';
+import Nav from '@/components/nav/Nav';
+
 import SessionProvider from '@/components/SessionProvider';
 import StoreProvider from '@/components/StoreProvider';
 import { getAuthSession } from '@/lib/auth';

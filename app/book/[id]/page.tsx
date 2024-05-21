@@ -31,15 +31,15 @@ export default async function Page({ params }: { params: { id: string } }) {
   return (
     <main className="flex flex-col items-center justify-center">
       {book && (
-        <div className="flex w-full max-w-[1248px] flex-row items-start justify-center gap-x-12 py-12 text-base text-neutral-950">
+        <div className="flex w-full max-w-[1248px] flex-col items-start justify-center gap-y-6 py-4 text-base text-neutral-950 md:flex-row md:gap-x-6 md:py-6 lg:gap-x-12 lg:py-12">
           <Image
-            className="min-w-96 max-w-[30vw]"
+            className="w-full grow-0 md:w-auto md:min-w-72 md:max-w-[30vw] lg:min-w-96"
             src={`/books/${book.id}.jpg`}
-            alt={book.description}
+            alt={book.title}
             width={580}
             height={915}
           />
-          <div className="flex w-full max-w-[40vw] flex-col items-start gap-y-5 whitespace-pre-wrap ">
+          <div className="flex w-full grow flex-col items-start gap-y-5 whitespace-pre-wrap">
             <div className="flex flex-col gap-y-2">
               <h1 className="text-2xl font-bold text-neutral-950">
                 {book.title}

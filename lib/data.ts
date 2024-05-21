@@ -1,6 +1,39 @@
 import { BookType } from '@prisma/client';
 import prisma from './prisma';
 
+export enum SortOrder {
+  PriceAsc = 'price_asc',
+  PriceDesc = 'price_desc',
+  TitleAsc = 'title_asc',
+  TitleDesc = 'title_desc',
+  Time = 'time',
+}
+
+function getSortOrder(sortOrder: SortOrder | null):
+  | {
+      [key: string]: 'asc' | 'desc';
+    }
+  | undefined {
+  if (!sortOrder) {
+    return undefined;
+  }
+
+  switch (sortOrder) {
+    case SortOrder.PriceAsc:
+      return { price: 'asc' };
+    case SortOrder.PriceDesc:
+      return { price: 'desc' };
+    case SortOrder.TitleAsc:
+      return { title: 'asc' };
+    case SortOrder.TitleDesc:
+      return { title: 'desc' };
+    case SortOrder.Time:
+      return { publishDate: 'desc' };
+    default:
+      return undefined;
+  }
+}
+
 export async function fetchAuthorById(id: string) {
   try {
     const author = await prisma?.author.findUnique({
@@ -13,7 +46,6 @@ export async function fetchAuthorById(id: string) {
       return author as Author;
     }
   } catch (e) {
-    //FIXME:
     console.error('DatabaseError:', e);
     return null;
   }
@@ -29,7 +61,6 @@ export async function fetchAllAuthors(): Promise<Author[]> {
       return authors as Author[];
     }
   } catch (e) {
-    //FIXME:
     console.error('DatabaseError:', e);
     return [];
   }
@@ -62,7 +93,6 @@ export async function fetchAllPublishers(): Promise<Publisher[]> {
       return publishers as Publisher[];
     }
   } catch (e) {
-    //FIXME:
     console.error('DatabaseError:', e);
     return [];
   }
@@ -80,7 +110,6 @@ export async function fetchCategoryById(id: string): Promise<Category | null> {
       return category as Category;
     }
   } catch (e) {
-    //FIXME:
     console.error('DatabaseError:', e);
     return null;
   }
@@ -96,13 +125,15 @@ export async function fetchAllCategories(): Promise<Category[]> {
       return categories as Category[];
     }
   } catch (e) {
-    //FIXME:
     console.error('DatabaseError:', e);
     return [];
   }
 }
 
-export async function fetchSimpleBooks(currentPage: number) {
+export async function fetchSimpleBooks(
+  currentPage: number,
+  sortOrder: SortOrder | null,
+) {
   try {
     const offset = (currentPage - 1) * 6;
 
@@ -117,6 +148,7 @@ export async function fetchSimpleBooks(currentPage: number) {
         author: true,
         title: true,
       },
+      orderBy: getSortOrder(sortOrder),
     });
 
     if (!bookPage) {
@@ -133,6 +165,7 @@ export async function fetchSimpleBooks(currentPage: number) {
 export async function fetchSimpleBooksByAuthor(
   currentPage: number,
   authorId: string,
+  sortOrder: SortOrder | null,
 ) {
   try {
     const offset = (currentPage - 1) * 6;
@@ -151,6 +184,7 @@ export async function fetchSimpleBooksByAuthor(
         author: true,
         title: true,
       },
+      orderBy: getSortOrder(sortOrder),
     });
 
     if (!bookPage) {
@@ -167,6 +201,7 @@ export async function fetchSimpleBooksByAuthor(
 export async function fetchSimpleBooksByPublisher(
   currentPage: number,
   publisherId: string,
+  sortOrder: SortOrder | null,
 ) {
   try {
     const offset = (currentPage - 1) * 6;
@@ -185,6 +220,7 @@ export async function fetchSimpleBooksByPublisher(
         author: true,
         title: true,
       },
+      orderBy: getSortOrder(sortOrder),
     });
 
     if (!bookPage) {
@@ -201,6 +237,7 @@ export async function fetchSimpleBooksByPublisher(
 export async function fetchSimpleBooksByCategory(
   currentPage: number,
   categoryId: string,
+  sortOrder: SortOrder | null,
 ) {
   try {
     const offset = (currentPage - 1) * 6;
@@ -219,6 +256,7 @@ export async function fetchSimpleBooksByCategory(
         author: true,
         title: true,
       },
+      orderBy: getSortOrder(sortOrder),
     });
 
     if (!bookPage) {
@@ -273,6 +311,10 @@ export async function fetchSimpleBooksCountByCategory(
     });
 
     const numberOfPages = categoryBooks ? categoryBooks / 6 : 1;
+
+    if (!isFinite(numberOfPages)) {
+      return 1;
+    }
 
     return Math.max(Math.ceil(numberOfPages), 1);
   } catch (e) {
@@ -417,7 +459,7 @@ export async function fetchSimpleFilteredBooksCount(term: string) {
   try {
     const q = `%${term}%`;
 
-    const books = await prisma.$queryRaw<number | null>`
+    const books = await prisma.$queryRaw<{ count: number | string | null }[]>`
     SELECT      COUNT(*)
     FROM        books
     INNER JOIN  authors ON authors.id=books.author_id
@@ -429,7 +471,11 @@ export async function fetchSimpleFilteredBooksCount(term: string) {
                 publishers.name ILIKE ${q} OR
                 categories.title ILIKE ${q};`;
 
-    const numberOfPages = books ? books / 6 : 1;
+    const numberOfPages = Number(books[0].count ?? '1') / 6;
+
+    if (!isFinite(numberOfPages)) {
+      return 1;
+    }
 
     return Math.max(Math.ceil(numberOfPages), 1);
   } catch (e) {
@@ -438,7 +484,11 @@ export async function fetchSimpleFilteredBooksCount(term: string) {
   }
 }
 
-export async function fetchWishedBooks(currentPage: number, userId: string) {
+export async function fetchWishedBooks(
+  currentPage: number,
+  userId: string,
+  sortOrder: SortOrder | null,
+) {
   try {
     const offset = (currentPage - 1) * 6;
 
@@ -467,6 +517,7 @@ export async function fetchWishedBooks(currentPage: number, userId: string) {
         author: true,
         title: true,
       },
+      orderBy: getSortOrder(sortOrder),
     });
 
     if (!wishedBooks) {
@@ -497,6 +548,7 @@ export async function fetchWishedBooksCount(userId: string) {
     return Math.max(Math.ceil(numberOfPages), 1);
   } catch (e) {
     console.error('DatabaseError:', e);
+
     return 1;
   }
 }

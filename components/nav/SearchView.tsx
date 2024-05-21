@@ -7,7 +7,7 @@ import { useState } from 'react';
 export default function SearchView({ placeholder }: { placeholder: string }) {
   const searchParams = useSearchParams();
   const previousSearch = searchParams.get('query') || '';
-  const { push, replace } = useRouter();
+  const { replace } = useRouter();
   const [text, setText] = useState(previousSearch);
 
   function handleSearch(term: string) {
@@ -21,14 +21,14 @@ export default function SearchView({ placeholder }: { placeholder: string }) {
 
   return (
     <form
-      className="flex w-full max-w-xl flex-row items-stretch justify-center"
+      className="flex max-w-xl grow flex-row items-stretch justify-center"
       onSubmit={(e) => {
         e.preventDefault();
         handleSearch(text);
       }}
     >
       <input
-        className="w-full min-w-36 appearance-none rounded-l-2xl border-2 border-r-0 border-solid border-orange-300 p-3 text-base text-slate-950 transition-colors duration-200 ease-in-out focus:border-orange-400 focus:outline-none"
+        className="w-full min-w-36 appearance-none rounded-l border-2 border-r-0 border-solid border-orange-300 p-3 text-base text-slate-950 transition-colors duration-200 ease-in-out focus:border-orange-400 focus:outline-none"
         placeholder={placeholder}
         onChange={(e) => setText(e.target.value)}
         value={text}

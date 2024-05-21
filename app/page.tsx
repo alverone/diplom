@@ -1,6 +1,8 @@
 import BooksGrid from '@/components/BooksGrid';
 import LoadingView from '@/components/LoadingView';
 import { fetchBookPagesCount, fetchSimpleBooks } from '@/lib/data';
+import { sortOrderFromString } from '@/lib/utils';
+import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 export default async function Page({
@@ -8,15 +10,20 @@ export default async function Page({
 }: {
   searchParams: {
     page?: string;
+    sortOrder?: string;
   };
 }) {
-  const { page } = searchParams;
+  const { page, sortOrder } = searchParams;
   const currentPage = Number(page ?? '1');
 
   const [books, pageCount] = await Promise.all([
-    fetchSimpleBooks(currentPage),
+    fetchSimpleBooks(currentPage, sortOrderFromString(sortOrder)),
     fetchBookPagesCount(),
   ]);
+
+  if (currentPage > pageCount) {
+    redirect('/');
+  }
 
   return (
     <main>

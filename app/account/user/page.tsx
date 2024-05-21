@@ -1,5 +1,6 @@
+import UserInfoForm from '@/components/forms/UserInfoForm';
 import LoadingView from '@/components/LoadingView';
-import UserInfoForm from '@/components/UserInfoForm';
+
 import { getAuthSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { signOut } from 'next-auth/react';
@@ -32,9 +33,11 @@ export default async function Page() {
 
   return (
     <Suspense fallback={<LoadingView />}>
-      <h2 className="mb-8 text-lg font-semibold text-neutral-950 xs:text-xl md:hidden">
-        Мій кабінет | Особисті дані
+      <h2 className="mb-8 text-lg font-semibold text-neutral-950 xs:text-xl">
+        <span className="md:invisible md:hidden">Мій кабінет | </span>
+        Особисті дані
       </h2>
+
       <UserInfoForm user={user} />
     </Suspense>
   );

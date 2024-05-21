@@ -2,7 +2,7 @@ import { ComponentPropsWithoutRef } from 'react';
 import Loader from './Loader';
 
 interface AppButtonProps extends ComponentPropsWithoutRef<'button'> {
-  label: string;
+  label: string | null;
   icon?: React.ReactNode;
   isLoading?: boolean;
   fullWidth?: boolean;

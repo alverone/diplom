@@ -3,8 +3,8 @@
 import { UpdateUserResponse, updateUser } from '@/lib/action';
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
-import AppInput from './AppInput';
-import { ButtonPrimary, ButtonSecondary } from './Buttons';
+import AppInput from '../AppInput';
+import { ButtonPrimary, ButtonSecondary } from '../Buttons';
 
 export default function UserInfoForm({
   user,

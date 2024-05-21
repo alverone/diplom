@@ -158,6 +158,8 @@ export async function updateUser(
       },
     });
 
+    revalidatePath(`/account/user`);
+
     return {
       status: 204,
       message: 'Ок',

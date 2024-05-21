@@ -1,5 +1,6 @@
 'use client';
 
+import LoadingView from '@/components/LoadingView';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -10,5 +11,5 @@ export default function Page() {
     router.replace('/account/user');
   });
 
-  return <></>;
+  return <LoadingView />;
 }

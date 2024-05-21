@@ -29,15 +29,17 @@ export default async function Page({
 
   if (currentPage > pageCount) {
     redirect('/account/orders', RedirectType.replace);
-    return;
   } else if (!orders || orders.length === 0) {
     notFound();
-    return;
   }
 
   return (
     <Suspense fallback={<LoadingView />}>
       <div className="mb-6 flex flex-col gap-y-4">
+        <h2 className="mb-4 text-lg font-semibold text-neutral-950 xs:text-xl">
+          <span className="md:invisible md:hidden">Мій кабінет | </span>
+          Замовлення
+        </h2>
         {orders.map((o) => (
           <OrderTile order={o} key={o.id} />
         ))}
@@ -65,11 +67,11 @@ function OrderTile({ order }: { order: Order }) {
         <div className="flex flex-row">
           <OrderBooks bookIds={order.bookIds} />
         </div>
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-end justify-center">
           <p className="text-medium text-center text-sm text-neutral-800">
             Сплачено
           </p>
-          <p className="text-center text-base font-medium text-neutral-950">
+          <p className="text-center text-base font-medium text-orange-600">
             {formatCurrency(order.price)}
           </p>
         </div>

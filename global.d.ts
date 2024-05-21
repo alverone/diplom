@@ -99,6 +99,6 @@ declare global {
   }
 
   interface PaginatedSearchParams {
-    searchParams: { page?: string };
+    searchParams: { page?: string; sortOrder?: string };
   }
 }

@@ -2,9 +2,10 @@
 
 import { addBookToWishes, removeBookFromWishes } from '@/lib/action';
 import { addBook } from '@/lib/features/checkout/checkout_slice';
+import { toggleCart } from '@/lib/features/drawers/drawers_slice';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { HeartIcon, PlusIcon } from '@heroicons/react/20/solid';
-import { Book } from '@prisma/client';
+import { HeartIcon } from '@heroicons/react/20/solid';
+import { CheckIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { ButtonPrimary, ButtonSecondary } from './Buttons';
@@ -23,7 +24,8 @@ export default function BookActions({
   const { data: session } = useSession();
   const [isWishing, setIsWishing] = useState(false);
 
-  const isBookInCheckout = booksInCheckout.includes(book.id);
+  const isBookInCheckout =
+    booksInCheckout.filter((b) => b.id === book.id).length > 0;
   const isBookWished = wishesIds.includes(book.id);
 
   async function onWishClick() {
@@ -44,8 +46,9 @@ export default function BookActions({
 
   function addToCheckout() {
     if (!isBookInCheckout) {
-      dispatch(addBook(book.id));
+      dispatch(addBook({ id: book.id, count: 1 }));
     }
+    dispatch(toggleCart(true));
   }
 
   return (
@@ -53,7 +56,13 @@ export default function BookActions({
       <ButtonPrimary
         label={isBookInCheckout ? 'В кошику' : 'В кошик'}
         onClick={addToCheckout}
-        icon={<PlusIcon width={20} height={20} />}
+        icon={
+          isBookInCheckout ? (
+            <CheckIcon width={20} height={20} />
+          ) : (
+            <ShoppingCartIcon width={20} height={20} />
+          )
+        }
       />
       {session && (
         <ButtonSecondary

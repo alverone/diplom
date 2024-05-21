@@ -6,6 +6,7 @@ import {
   fetchSimpleBooksByPublisher,
   fetchSimpleBooksCountByPublisher,
 } from '@/lib/data';
+import { sortOrderFromString } from '@/lib/utils';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -14,10 +15,10 @@ export default async function Page({
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { page?: string };
+  searchParams: { page?: string; sortOrder?: string };
 }) {
   const { id } = params;
-  const { page } = searchParams;
+  const { page, sortOrder } = searchParams;
   const currentPage = Number(page ?? '1');
   const publisher = await fetchPublisherById(id);
 
@@ -27,7 +28,11 @@ export default async function Page({
 
   const [pageCount, books] = await Promise.all([
     fetchSimpleBooksCountByPublisher(publisher.id),
-    fetchSimpleBooksByPublisher(currentPage, publisher.id),
+    fetchSimpleBooksByPublisher(
+      currentPage,
+      publisher.id,
+      sortOrderFromString(sortOrder),
+    ),
   ]);
 
   if (!books || books.length == 0) {

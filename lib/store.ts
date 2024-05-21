@@ -11,6 +11,7 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { checkoutSlice } from './features/checkout/checkout_slice';
+import { drawersSlice } from './features/drawers/drawers_slice';
 
 const persistConfig = {
   key: 'root',
@@ -29,6 +30,7 @@ export const makeStore = () => {
   return configureStore({
     reducer: {
       reducer: persistedReducer,
+      drawers: drawersSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({

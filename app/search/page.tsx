@@ -5,20 +5,26 @@ import {
   fetchSimpleBooksFiltered,
   fetchSimpleFilteredBooksCount,
 } from '@/lib/data';
+import { redirect, RedirectType } from 'next/navigation';
 import { Suspense } from 'react';
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams: { query: string; page?: string };
+  searchParams: { query: string; page?: string; sortOrder?: string };
 }) {
   const query = searchParams.query?.trim() ?? '';
   const currentPage = Number(searchParams.page || '1');
+  const sortOrder = searchParams.sortOrder ?? null;
 
-  const [count, books] = await Promise.all([
+  const [pageCount, books] = await Promise.all([
     fetchSimpleFilteredBooksCount(query),
     fetchSimpleBooksFiltered(query, currentPage),
   ]);
+
+  if (currentPage > pageCount) {
+    redirect(`/search?query=${query}`, RedirectType.replace);
+  }
 
   if (!books || books.length == 0) {
     return (
@@ -38,7 +44,7 @@ export default async function Page({
   return (
     <main>
       <h1 className="text-3xl font-bold text-neutral-950">Пошук</h1>
-      <BooksGrid books={books} pagesCount={count ?? 1} />
+      <BooksGrid books={books} pagesCount={pageCount ?? 1} />
     </main>
   );
 }

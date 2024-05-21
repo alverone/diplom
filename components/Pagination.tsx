@@ -35,11 +35,11 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
 
           return (
             <PaginationNumber
-              key={page}
+              key={page === '...' ? index : page}
               href={createPageURL(page)}
               page={page}
               position={position}
-              isActive={currentPage === page}
+              isActive={page !== '...' && currentPage === page}
             />
           );
         })}
@@ -70,7 +70,7 @@ function PaginationNumber({
       ? ' text-orange-700'
       : ' text-neutral-950');
 
-  return isActive || position === 'middle' ? (
+  return isActive && position === 'middle' ? (
     <div className={className}>{page}</div>
   ) : (
     <Link href={href} className={className}>

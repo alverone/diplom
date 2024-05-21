@@ -1,10 +1,12 @@
-export const formatCurrency = (amount: number) => {
+import { SortOrder } from './data';
+
+export const formatCurrency = (amount: number, useSymbol = false) => {
   return (
     amount.toLocaleString('en-US', {
       style: 'decimal',
-      minimumFractionDigits: 2,
+      minimumFractionDigits: 0,
       maximumFractionDigits: 2,
-    }) + ' грн'
+    }) + (useSymbol ? '₴' : ' грн')
   );
 };
 
@@ -18,35 +20,124 @@ export const formatDateToLocal = (date: Date, locale: string = 'uk-UA') => {
   return formatter.format(date);
 };
 
-export const generatePagination = (currentPage: number, totalPages: number) => {
-  // If the total number of pages is 7 or less,
-  // display all pages without any ellipsis.
-  if (totalPages <= 7) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
+export function range(start: number, end: number, step = 1) {
+  if (!Number.isInteger(start)) {
+    throw new TypeError('start should be an integer, received: ' + start);
+  }
+  if (!Number.isInteger(end)) {
+    throw new TypeError('end should be an integer, received: ' + end);
+  }
+  if (!Number.isInteger(step)) {
+    throw new TypeError('step should be an integer, received: ' + step);
   }
 
-  // If the current page is among the first 3 pages,
-  // show the first 3, an ellipsis, and the last 2 pages.
-  if (currentPage <= 3) {
-    return [1, 2, 3, '...', totalPages - 1, totalPages];
+  if (end < start) {
+    throw new RangeError(
+      'end should be greater than start, received: ' + end + ' < ' + start,
+    );
+  }
+  if (step < 1) {
+    throw new RangeError(
+      'step should be a positive integer, received: ' + step,
+    );
   }
 
-  // If the current page is among the last 3 pages,
-  // show the first 2, an ellipsis, and the last 3 pages.
-  if (currentPage >= totalPages - 2) {
-    return [1, 2, '...', totalPages - 2, totalPages - 1, totalPages];
+  return Array.from(
+    { length: (end - start) / step + 1 },
+    (_, i) => start + i * step,
+  );
+}
+
+export function sortOrderFromString(sortOrder: string | undefined | null) {
+  if (!sortOrder) {
+    return null;
   }
 
-  // If the current page is somewhere in the middle,
-  // show the first page, an ellipsis, the current page and its neighbors,
-  // another ellipsis, and the last page.
-  return [
-    1,
-    '...',
-    currentPage - 1,
-    currentPage,
-    currentPage + 1,
-    '...',
-    totalPages,
-  ];
-};
+  switch (sortOrder) {
+    case 'price_asc':
+      return SortOrder.PriceAsc;
+    case 'price_desc':
+      return SortOrder.PriceDesc;
+    case 'title_asc':
+      return SortOrder.TitleAsc;
+    case 'title_desc':
+      return SortOrder.TitleDesc;
+    default:
+      return null;
+  }
+}
+
+export function generatePagination(
+  curPage: number,
+  numPages: number,
+  numPagesAtEdges = 1,
+  numPagesAroundCurrent = 1,
+  glue = '…',
+) {
+  const numItemsInSequence =
+    1 + numPagesAroundCurrent * 2 + numPagesAtEdges * 2 + 2;
+  const reworkedCurPage = Math.min(curPage, numPages);
+  let finalSequence = [];
+
+  if (numPages <= numItemsInSequence) {
+    finalSequence = range(1, numPages);
+  } else {
+    const start = numPagesAtEdges > 0 ? 1 : reworkedCurPage;
+    const sequence: {
+      leftEdge: number[] | null;
+      glueLeftCenter: (string | number)[] | null;
+      centerPiece: (string | number)[] | null;
+      glueCenterRight: (string | number)[] | null;
+      rightEdge: number[] | null;
+    } = {
+      leftEdge: null,
+      glueLeftCenter: null,
+      centerPiece: null,
+      glueCenterRight: null,
+      rightEdge: null,
+    };
+
+    if (reworkedCurPage < numItemsInSequence / 2) {
+      sequence.leftEdge = range(
+        1,
+        Math.ceil(numItemsInSequence / 2) + numPagesAroundCurrent,
+      );
+      sequence.centerPiece = [glue];
+      if (numPagesAtEdges > 0)
+        sequence.rightEdge = range(numPages - (numPagesAtEdges - 1), numPages);
+    } else if (reworkedCurPage > numPages - numItemsInSequence / 2) {
+      if (numPagesAtEdges > 0)
+        sequence.leftEdge = range(start, numPagesAtEdges);
+      sequence.centerPiece = [glue];
+      sequence.rightEdge = range(
+        Math.min(
+          numPages - Math.floor(numItemsInSequence / 2) - numPagesAroundCurrent,
+          reworkedCurPage - numPagesAroundCurrent,
+        ),
+        numPages,
+      );
+    } else {
+      sequence.centerPiece = range(
+        reworkedCurPage - numPagesAroundCurrent,
+        reworkedCurPage + numPagesAroundCurrent,
+      );
+
+      if (numPagesAtEdges > 0)
+        sequence.leftEdge = range(start, numPagesAtEdges);
+      if (numPagesAtEdges > 0)
+        sequence.rightEdge = range(numPages - (numPagesAtEdges - 1), numPages);
+
+      sequence.glueLeftCenter =
+        sequence.centerPiece[0] == numPagesAtEdges + 2
+          ? [numPagesAtEdges + 1]
+          : [glue];
+      sequence.glueCenterRight = [glue];
+    }
+
+    finalSequence = Object.values(sequence)
+      .filter((v) => v !== null)
+      .flat();
+  }
+
+  return finalSequence;
+}

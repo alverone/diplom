@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import NavLinkItem from './NavLinkItem';
+import NavLinkItem from './nav/NavLinkItem';
 
 export default function Footer() {
   return (
