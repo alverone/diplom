@@ -9,7 +9,7 @@ import { BookType, OrderStatus } from '@prisma/client';
 
 import { getAppSession } from './auth';
 import prisma from './prisma';
-import { bookTypeFromString } from './utils';
+import { bookTypeFromString, orderStatusFromString } from './utils';
 
 const createSchema = z.object({
   email: z.string().email({ message: 'Невірний email' }),
@@ -85,6 +85,18 @@ export interface ValidateAuthorErrors {
 }
 export interface ValidatePublisherErrors {
   name?: string[] | undefined;
+}
+
+export interface ValidateOrderErrors {
+  address?: string[] | undefined;
+  id?: string[] | undefined;
+  description?: string[] | undefined;
+  price?: string[] | undefined;
+  status?: string[] | undefined;
+  email?: string[] | undefined;
+  fullName?: string[] | undefined;
+  phone?: string[] | undefined;
+  userId?: string[] | undefined;
 }
 
 export interface ValidateBookErrors {
@@ -1056,6 +1068,95 @@ export async function createBook(
 
     return {
       status: 201,
+      message: 'Ок',
+    };
+  } catch (e) {
+    console.error(e);
+
+    return {
+      status: 500,
+      message: 'Internal server error',
+    };
+  }
+}
+
+export async function updateOrder(
+  fd: FormData,
+): Promise<ActionResponse<ValidateOrderErrors>> {
+  try {
+    const orderPayload = {
+      price: parseFloat(fd.get('price') as string),
+      fullName: fd.get('fullName') as string,
+      email: fd.get('email') as string,
+      phone: fd.get('phone') as string,
+      address: fd.get('address') as string,
+      status: fd.get('status') as string,
+      //userId: fd.get('userId') as string,
+      description: fd.get('description') as string,
+      id: parseInt(fd.get('id') as string),
+    };
+
+    const validatedFields = z
+      .object({
+        fullName: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        email: z.string().email({ message: 'Невірний email' }),
+        phone: z.string().min(1, { message: 'Обовʼязкове поле' }),
+        address: z.string().min(1, { message: 'Обовʼязкове поле' }),
+        price: z.number().min(0.01, { message: 'Ціна повинна бути більше 0' }),
+        status: z.nativeEnum(OrderStatus),
+        //userId: z.string().trim().min(1),
+        id: z.number().int().positive(),
+      })
+      .safeParse(orderPayload);
+
+    if (!validatedFields.success) {
+      return {
+        status: 400,
+        message: 'Перевірте правильність введених даних',
+        errors: validatedFields.error?.flatten().fieldErrors,
+      };
+    }
+
+    const { price, fullName, email, phone, address, status, description, id } =
+      orderPayload;
+
+    const orderStatus = orderStatusFromString(status);
+
+    await prisma.order.update({
+      where: {
+        id: id,
+      },
+      data: {
+        price: {
+          set: price,
+        },
+        fullName: {
+          set: fullName,
+        },
+        email: {
+          set: email,
+        },
+        phone: {
+          set: phone,
+        },
+        address: {
+          set: address,
+        },
+        ...(orderStatus && {
+          status: {
+            set: orderStatus!,
+          },
+        }),
+        description: {
+          set: description,
+        },
+      },
+    });
+
+    revalidatePath(`/admin/orders/${id}`);
+
+    return {
+      status: 204,
       message: 'Ок',
     };
   } catch (e) {

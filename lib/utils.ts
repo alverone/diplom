@@ -1,4 +1,4 @@
-import { BookType } from '@prisma/client';
+import { BookType, OrderStatus } from '@prisma/client';
 import { SortOrder } from './data';
 
 export const formatCurrency = (amount: number, useSymbol = false) => {
@@ -78,6 +78,27 @@ export function bookTypeFromString(bookType: string | undefined | null) {
       return BookType.ELECTRONIC;
     case 'PAPER':
       return BookType.PAPER;
+    default:
+      return null;
+  }
+}
+
+export function orderStatusFromString(orderStatus: string | undefined | null) {
+  if (!orderStatus) {
+    return null;
+  }
+
+  switch (orderStatus) {
+    case 'COMPLETED':
+      return OrderStatus.COMPLETED;
+    case 'SHIPPED':
+      return OrderStatus.SHIPPED;
+    case 'PROCESSING':
+      return OrderStatus.PROCESSING;
+    case 'CREATED':
+      return OrderStatus.CREATED;
+    case 'ACCEPTED':
+      return OrderStatus.ACCEPTED;
     default:
       return null;
   }

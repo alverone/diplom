@@ -84,6 +84,11 @@ declare global {
     status: OrderStatus;
     createdAt: Date;
     updatedAt: Date;
+    fullName: string | null;
+    phone: string | null;
+    address: string | null;
+    description: string | null;
+    email: string | null;
   }
 
   interface AppSessionUser extends User {
