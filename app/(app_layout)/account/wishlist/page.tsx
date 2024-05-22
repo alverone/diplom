@@ -7,10 +7,11 @@ import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 export default async function Page({ searchParams }: PaginatedSearchParams) {
-  const { page, sortOrder } = searchParams;
+  const { page } = searchParams;
   const currentPage = Number(page ?? '1');
   const session = await getAppSession();
   const userId = session?.user?.id ?? '';
+  const sortOrder = sortOrderFromString(searchParams.sortOrder);
 
   const [pageCount, books] = await Promise.all([
     fetchWishedBooksCount(userId),
@@ -31,7 +32,7 @@ export default async function Page({ searchParams }: PaginatedSearchParams) {
         <span className="md:invisible md:hidden">Мій кабінет | </span>Список
         обраного
       </h2>
-      <BooksGrid books={books} pagesCount={pageCount} />
+      <BooksGrid books={books} pagesCount={pageCount} sortOrder={sortOrder} />
     </Suspense>
   );
 }

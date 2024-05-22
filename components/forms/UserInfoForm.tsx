@@ -81,7 +81,7 @@ export default function UserInfoForm({
         <SubmitButton />
         <ButtonSecondary label="Відмінити зміни" type="reset" />
       </div>
-      {message != 'ok' && !errors && (
+      {message !== 'Ok' && !errors && (
         <label className="mt-1 text-sm font-medium text-red-500">
           {message}
         </label>

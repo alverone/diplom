@@ -17,9 +17,10 @@ export default async function Page({
   searchParams: { page?: string; sortOrder?: string };
 }) {
   const { id } = params;
-  const { page, sortOrder } = searchParams;
+  const { page } = searchParams;
   const currentPage = Number(page ?? '1');
   const category = await fetchCategoryById(id);
+  const sortOrder = sortOrderFromString(searchParams.sortOrder);
 
   if (!category) {
     notFound();
@@ -27,11 +28,7 @@ export default async function Page({
 
   const [pageCount, books] = await Promise.all([
     fetchSimpleBooksCountByCategory(category.id),
-    fetchSimpleBooksByCategory(
-      currentPage,
-      category.id,
-      sortOrderFromString(sortOrder),
-    ),
+    fetchSimpleBooksByCategory(currentPage, category.id, sortOrder),
   ]);
 
   if (!books || books.length == 0) {
@@ -45,7 +42,7 @@ export default async function Page({
         fallback={<LoadingView />}
         key={`${category.id}/${currentPage}`}
       >
-        <BooksGrid books={books} pagesCount={pageCount} />
+        <BooksGrid books={books} pagesCount={pageCount} sortOrder={sortOrder} />
       </Suspense>
     </main>
   );

@@ -6,7 +6,7 @@ import {
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
 import CrossIcon from '../CrossIcon';
-import ProfileTab from '../ProfileTab';
+import SidebarTab from '../SidebarTab';
 
 export default function ProfileNavDrawer() {
   const dispatch = useAppDispatch();
@@ -24,25 +24,25 @@ export default function ProfileNavDrawer() {
           height={24}
         />
       </div>
-      <ProfileTab
+      <SidebarTab
         icon={<UserCircleIcon width={24} height={24} />}
         text="Особисті дані"
         href="/account/user"
         onClick={closeModal}
       />
-      <ProfileTab
+      <SidebarTab
         icon={<HeartIcon width={24} height={24} />}
         text="Список бажаних"
         href="/account/wishlist"
         onClick={closeModal}
       />
-      <ProfileTab
+      <SidebarTab
         icon={<ArchiveBoxIcon width={24} height={24} />}
         text="Історія замовлень"
         href="/account/orders"
         onClick={closeModal}
       />
-      <ProfileTab text="Вихід" href="/signout" onClick={closeModal} />
+      <SidebarTab text="Вихід" href="/signout" onClick={closeModal} />
     </div>
   );
 }

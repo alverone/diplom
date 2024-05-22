@@ -83,7 +83,7 @@ export default function RegistrationForm({
           Пароль повинен містити не менше 8 символів, без урахування пробілів
         </label>
       </AppInput>
-      {message != 'ok' && !errors && (
+      {message !== 'Ok' && !errors && (
         <label className="mt-1 text-sm font-medium text-red-500">
           {message}
         </label>

@@ -46,7 +46,7 @@ export default function BookActions({
 
   function addToCheckout() {
     if (!isBookInCheckout) {
-      dispatch(addBook({ id: book.id, count: 1 }));
+      dispatch(addBook({ id: book.id, count: 1, coverUrl: book.coverUrl }));
     }
     dispatch(toggleCart(true));
   }

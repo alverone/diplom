@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { OrderStatus } from '@prisma/client';
+
 import { getAppSession } from './auth';
 import prisma from './prisma';
 
@@ -72,6 +73,16 @@ export interface MakeOrderErrors {
   phone?: string[] | undefined;
   email?: string[] | undefined;
   address?: string[] | undefined;
+}
+
+export interface ValidateCategoryErrors {
+  title?: string[] | undefined;
+}
+export interface ValidateAuthorErrors {
+  name?: string[] | undefined;
+}
+export interface ValidatePublisherErrors {
+  name?: string[] | undefined;
 }
 
 export async function createUser(
@@ -381,5 +392,358 @@ export async function createOrder(
       status: 500,
       message: 'Internal server error',
     };
+  }
+}
+
+export async function updateCategory(
+  fd: FormData,
+): Promise<ActionResponse<ValidateCategoryErrors>> {
+  try {
+    const categoryPayload = {
+      title: fd.get('title') as string,
+      description: fd.get('description') as string,
+      id: fd.get('id') as string,
+    };
+
+    const validatedFields = z
+      .object({
+        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+      })
+      .safeParse(categoryPayload);
+
+    if (!validatedFields.success) {
+      return {
+        status: 400,
+        message: 'Перевірте правильність введених даних',
+        errors: validatedFields.error?.flatten().fieldErrors,
+      };
+    }
+
+    const { title, description, id } = categoryPayload;
+
+    await prisma.category.update({
+      where: {
+        id: id,
+      },
+      data: {
+        title: title.trim(),
+        description: description.trim(),
+      },
+    });
+
+    revalidatePath(`/admin/categories/${id}`);
+
+    return {
+      status: 204,
+      message: 'Ок',
+    };
+  } catch (e) {
+    console.error(e);
+
+    return {
+      status: 500,
+      message: 'Internal server error',
+    };
+  }
+}
+
+export async function createCategory(
+  fd: FormData,
+): Promise<ActionResponse<ValidateCategoryErrors>> {
+  try {
+    const categoryPayload = {
+      title: fd.get('title') as string,
+      description: fd.get('description') as string,
+    };
+
+    const validatedFields = z
+      .object({
+        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+      })
+      .safeParse(categoryPayload);
+
+    if (!validatedFields.success) {
+      return {
+        status: 400,
+        message: 'Перевірте правильність введених даних',
+        errors: validatedFields.error?.flatten().fieldErrors,
+      };
+    }
+
+    const { title, description } = categoryPayload;
+
+    await prisma.category.create({
+      data: {
+        title: title.trim(),
+        description: description.trim(),
+      },
+    });
+
+    revalidatePath(`/admin/categories`);
+
+    return {
+      status: 204,
+      message: 'Ок',
+    };
+  } catch (e) {
+    console.error(e);
+
+    return {
+      status: 500,
+      message: 'Internal server error',
+    };
+  }
+}
+
+export async function updateAuthor(
+  fd: FormData,
+): Promise<ActionResponse<ValidateAuthorErrors>> {
+  try {
+    const authorPayload = {
+      name: fd.get('name') as string,
+      description: fd.get('description') as string,
+      id: fd.get('id') as string,
+    };
+
+    const validatedFields = z
+      .object({
+        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+      })
+      .safeParse(authorPayload);
+
+    if (!validatedFields.success) {
+      return {
+        status: 400,
+        message: 'Перевірте правильність введених даних',
+        errors: validatedFields.error?.flatten().fieldErrors,
+      };
+    }
+
+    const { name, description, id } = authorPayload;
+
+    await prisma.author.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name: name.trim(),
+        description: description.trim(),
+      },
+    });
+
+    revalidatePath(`/admin/authors/${id}`);
+
+    return {
+      status: 204,
+      message: 'Ок',
+    };
+  } catch (e) {
+    console.error(e);
+
+    return {
+      status: 500,
+      message: 'Internal server error',
+    };
+  }
+}
+
+export async function createAuthor(
+  fd: FormData,
+): Promise<ActionResponse<ValidateAuthorErrors>> {
+  try {
+    const authorPayload = {
+      name: fd.get('name') as string,
+      description: fd.get('description') as string,
+    };
+
+    const validatedFields = z
+      .object({
+        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+      })
+      .safeParse(authorPayload);
+
+    if (!validatedFields.success) {
+      return {
+        status: 400,
+        message: 'Перевірте правильність введених даних',
+        errors: validatedFields.error?.flatten().fieldErrors,
+      };
+    }
+
+    const { name, description } = authorPayload;
+
+    await prisma.author.create({
+      data: {
+        name: name.trim(),
+        description: description.trim(),
+      },
+    });
+
+    revalidatePath(`/admin/authors`);
+
+    return {
+      status: 204,
+      message: 'Ок',
+    };
+  } catch (e) {
+    console.error(e);
+
+    return {
+      status: 500,
+      message: 'Internal server error',
+    };
+  }
+}
+
+export async function updatePublisher(
+  fd: FormData,
+): Promise<ActionResponse<ValidatePublisherErrors>> {
+  try {
+    const publisherPayload = {
+      name: fd.get('name') as string,
+      description: fd.get('description') as string,
+      id: fd.get('id') as string,
+    };
+    const validatedFields = z
+      .object({
+        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+      })
+      .safeParse(publisherPayload);
+
+    if (!validatedFields.success) {
+      return {
+        status: 400,
+        message: 'Перевірте правильність введених даних',
+        errors: validatedFields.error?.flatten().fieldErrors,
+      };
+    }
+
+    const { name, description, id } = publisherPayload;
+
+    await prisma.author.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name: name.trim(),
+        description: description.trim(),
+      },
+    });
+
+    revalidatePath(`/admin/publisher/${id}`);
+
+    return {
+      status: 204,
+      message: 'Ок',
+    };
+  } catch (e) {
+    console.error(e);
+
+    return {
+      status: 500,
+      message: 'Internal server error',
+    };
+  }
+}
+
+export async function createPublisher(
+  fd: FormData,
+): Promise<ActionResponse<ValidatePublisherErrors>> {
+  try {
+    const publisherPayload = {
+      name: fd.get('name') as string,
+      description: fd.get('description') as string,
+    };
+
+    const validatedFields = z
+      .object({
+        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+      })
+      .safeParse(publisherPayload);
+
+    if (!validatedFields.success) {
+      return {
+        status: 400,
+        message: 'Перевірте правильність введених даних',
+        errors: validatedFields.error?.flatten().fieldErrors,
+      };
+    }
+
+    const { name, description } = publisherPayload;
+
+    await prisma.publisher.create({
+      data: {
+        name: name.trim(),
+        description: description.trim(),
+      },
+    });
+
+    revalidatePath(`/admin/publishers`);
+
+    return {
+      status: 204,
+      message: 'Ок',
+    };
+  } catch (e) {
+    console.error(e);
+
+    return {
+      status: 500,
+      message: 'Internal server error',
+    };
+  }
+}
+
+export async function deleteCategory(id: string): Promise<boolean> {
+  try {
+    await prisma.category.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    revalidatePath(`/admin/categories`);
+
+    return true;
+  } catch (e) {
+    console.error(e);
+
+    return false;
+  }
+}
+
+export async function deleteAuthor(id: string): Promise<boolean> {
+  try {
+    await prisma.author.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    revalidatePath(`/admin/authors`);
+
+    return true;
+  } catch (e) {
+    console.error(e);
+
+    return false;
+  }
+}
+
+export async function deletePublisher(id: string): Promise<boolean> {
+  try {
+    await prisma.publisher.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    revalidatePath(`/admin/publishers`);
+
+    return true;
+  } catch (e) {
+    console.error(e);
+
+    return false;
   }
 }

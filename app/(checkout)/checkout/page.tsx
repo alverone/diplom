@@ -82,6 +82,7 @@ export default function Page() {
                     book={book}
                     count={books.find((b) => b.id == book.id)?.count ?? 1}
                     includeBorder={index !== loadedBooks!.length - 1}
+                    size={48}
                   />
                 ))}
               <div className="mt-4 flex flex-row justify-between gap-x-6 border-t-2 border-orange-400/25 pt-4">

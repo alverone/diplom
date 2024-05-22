@@ -1,7 +1,0 @@
-/* */
-.scrollableTabs {
-  display: flex;
-  flex-direction: row;
-  column-gap: 16px;
-  overflow: scroll-x;
-}

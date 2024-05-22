@@ -13,11 +13,12 @@ export default async function Page({
     sortOrder?: string;
   };
 }) {
-  const { page, sortOrder } = searchParams;
+  const { page } = searchParams;
   const currentPage = Number(page ?? '1');
+  const sortOrder = sortOrderFromString(searchParams.sortOrder);
 
   const [books, pageCount] = await Promise.all([
-    fetchSimpleBooks(currentPage, sortOrderFromString(sortOrder)),
+    fetchSimpleBooks(currentPage, sortOrder),
     fetchBookPagesCount(),
   ]);
 
@@ -29,7 +30,7 @@ export default async function Page({
     <main>
       <h1 className="text-3xl text-neutral-950">Каталог</h1>
       <Suspense fallback={<LoadingView />} key={`catalog/${currentPage}`}>
-        <BooksGrid books={books} pagesCount={pageCount} />
+        <BooksGrid books={books} pagesCount={pageCount} sortOrder={sortOrder} />
       </Suspense>
     </main>
   );

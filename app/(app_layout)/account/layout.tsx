@@ -1,4 +1,4 @@
-import ProfileTab from '@/components/ProfileTab';
+import SidebarTab from '@/components/SidebarTab';
 import { getAppSession } from '@/lib/auth';
 import {
   ArchiveBoxIcon,
@@ -14,7 +14,7 @@ export default async function AccountLayout({
 }) {
   const session = await getAppSession();
 
-  if (!session) {
+  if (!session || !session?.user) {
     redirect('/', RedirectType.replace);
   }
 
@@ -24,22 +24,22 @@ export default async function AccountLayout({
         <h1 className="mb-4 text-2xl font-semibold text-neutral-950">
           Мій кабінет
         </h1>
-        <ProfileTab
+        <SidebarTab
           icon={<UserCircleIcon width={24} height={24} />}
           text="Особисті дані"
           href="/account/user"
         />
-        <ProfileTab
+        <SidebarTab
           icon={<HeartIcon width={24} height={24} />}
           text="Список бажаних"
           href="/account/wishlist"
         />
-        <ProfileTab
+        <SidebarTab
           icon={<ArchiveBoxIcon width={24} height={24} />}
           text="Історія замовлень"
           href="/account/orders"
         />
-        <ProfileTab text="Вихід" href="/signout" />
+        <SidebarTab text="Вихід" href="/signout" />
       </div>
 
       <main className="w-full justify-stretch p-0 xs:p-6">{children}</main>

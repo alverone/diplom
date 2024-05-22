@@ -4,12 +4,14 @@ interface AppTextareaProps extends ComponentPropsWithoutRef<'textarea'> {
   label?: string;
   wrapperClassName?: string;
   children?: React.ReactNode;
+  defaultValue?: string;
 }
 
 export default function AppTextarea({
   children,
   label,
   wrapperClassName,
+  defaultValue,
   ...rest
 }: AppTextareaProps) {
   const textareaClass =
@@ -19,12 +21,18 @@ export default function AppTextarea({
     return (
       <div className={wrapperClassName}>
         {label && <TextareaLabel text={label} name={rest.name} />}
-        <textarea className={textareaClass} {...rest} />
+        <textarea className={textareaClass} {...rest}>
+          {defaultValue}
+        </textarea>
       </div>
     );
   }
 
-  return <textarea className={textareaClass} {...rest} />;
+  return (
+    <textarea className={textareaClass} {...rest}>
+      {defaultValue}
+    </textarea>
+  );
 }
 
 function TextareaLabel({

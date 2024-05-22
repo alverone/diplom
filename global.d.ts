@@ -111,6 +111,7 @@ declare global {
 
   type BookAndCount = {
     id: string;
+    coverUrl: string | null;
     count: number;
   };
 }

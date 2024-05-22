@@ -109,7 +109,7 @@ export default function CheckoutForm({ onSuccess }: { onSuccess: () => void }) {
         rows={4}
       />
 
-      {message != 'ok' && !errors && (
+      {message !== 'Ok' && !errors && (
         <label className="mt-1 text-sm font-medium text-red-500">
           {message}
         </label>

@@ -11,11 +11,10 @@ import { Suspense } from 'react';
 export default async function Page({
   searchParams,
 }: {
-  searchParams: { query: string; page?: string; sortOrder?: string };
+  searchParams: { query: string; page?: string };
 }) {
   const query = searchParams.query?.trim() ?? '';
   const currentPage = Number(searchParams.page || '1');
-  const sortOrder = searchParams.sortOrder ?? null;
 
   const [pageCount, books] = await Promise.all([
     fetchSimpleFilteredBooksCount(query),

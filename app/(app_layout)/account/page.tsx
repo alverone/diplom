@@ -1,15 +1,9 @@
-'use client';
-
 import LoadingView from '@/components/LoadingView';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 export default function Page() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace('/account/user');
-  });
-
-  return <LoadingView />;
+  return (
+    <main className="flex max-h-screen min-h-[512px] flex-col items-center justify-center">
+      <LoadingView />
+    </main>
+  );
 }

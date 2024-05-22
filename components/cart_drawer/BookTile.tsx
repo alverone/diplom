@@ -15,10 +15,12 @@ export default function BookTile({
   book,
   count,
   includeBorder = true,
+  size = 64,
 }: {
   book: BookSimplified;
   count: number;
   includeBorder?: boolean;
+  size?: number;
 }) {
   const dispatch = useAppDispatch();
 
@@ -27,10 +29,10 @@ export default function BookTile({
       className={`relative flex flex-row items-center gap-x-4 ${includeBorder ? 'border-b-2 border-neutral-200 pb-5' : ''}`}
     >
       <Image
-        width="64"
-        height="64"
+        width={size}
+        height={size}
         src={book.coverUrl ?? 'images/placeholder_book.jpg'}
-        alt=""
+        alt={book.title}
         className="self-center"
       />
       <div className="flex grow flex-col gap-y-2">

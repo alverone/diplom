@@ -17,8 +17,9 @@ export default async function Page({
   searchParams: { page?: string; sortOrder?: string };
 }) {
   const { id } = params;
-  const { page, sortOrder } = searchParams;
+  const { page } = searchParams;
 
+  const sortOrder = sortOrderFromString(searchParams.sortOrder);
   const currentPage = Number(page ?? '1');
   const author = await fetchAuthorById(id);
 
@@ -39,7 +40,7 @@ export default async function Page({
     <main>
       <h1 className="text-3xl font-bold text-neutral-950">{author.name}</h1>
       <Suspense fallback={<LoadingView />}>
-        <BooksGrid books={books} pagesCount={pageCount} />
+        <BooksGrid books={books} pagesCount={pageCount} sortOrder={sortOrder} />
       </Suspense>
     </main>
   );
