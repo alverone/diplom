@@ -1,4 +1,5 @@
 import CreateButton from '@/components/admin/CreateButton';
+import CategoriesList from '@/components/admin/lists/CategoriesList';
 import Pagination from '@/components/Pagination';
 import {
   CatalogBookLimit,
@@ -6,7 +7,6 @@ import {
   fetchCategoriesPaginated,
 } from '@/lib/data';
 import { redirect } from 'next/navigation';
-import CategoriesList from './CategoriesList';
 
 export default async function Page({
   searchParams,

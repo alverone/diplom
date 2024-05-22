@@ -29,11 +29,7 @@ export default async function Page({
 
   const [pageCount, books] = await Promise.all([
     fetchSimpleBooksCountByAuthor(author.id),
-    fetchSimpleBooksByAuthor(
-      currentPage,
-      author.id,
-      sortOrderFromString(sortOrder),
-    ),
+    fetchSimpleBooksByAuthor(currentPage, author.id, sortOrder),
   ]);
 
   return (

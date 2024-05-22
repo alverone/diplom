@@ -1,13 +1,15 @@
 'use server';
+import { del, put } from '@vercel/blob';
 
 import { hashSync } from 'bcrypt';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
-import { OrderStatus } from '@prisma/client';
+import { BookType, OrderStatus } from '@prisma/client';
 
 import { getAppSession } from './auth';
 import prisma from './prisma';
+import { bookTypeFromString } from './utils';
 
 const createSchema = z.object({
   email: z.string().email({ message: 'Невірний email' }),
@@ -83,6 +85,17 @@ export interface ValidateAuthorErrors {
 }
 export interface ValidatePublisherErrors {
   name?: string[] | undefined;
+}
+
+export interface ValidateBookErrors {
+  type?: string[] | undefined;
+  title?: string[] | undefined;
+  description?: string[] | undefined;
+  price?: string[] | undefined;
+  pageLength?: string[] | undefined;
+  cover?: string[] | undefined;
+  publishDate?: string[] | undefined;
+  authorId?: string[] | undefined;
 }
 
 export async function createUser(
@@ -745,5 +758,312 @@ export async function deletePublisher(id: string): Promise<boolean> {
     console.error(e);
 
     return false;
+  }
+}
+
+export async function deleteBook(id: string): Promise<boolean> {
+  try {
+    const idAndCover = await prisma.book.findUnique({
+      where: {
+        id: id,
+      },
+      select: {
+        id: true,
+        coverUrl: true,
+      },
+    });
+
+    if (!idAndCover) {
+      return false;
+    }
+
+    if (idAndCover?.coverUrl) {
+      await del(idAndCover?.coverUrl);
+    }
+
+    await prisma.book.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    revalidatePath(`/admin/books`);
+
+    return true;
+  } catch (e) {
+    console.error(e);
+
+    return false;
+  }
+}
+
+export async function updateBook(
+  bookId: string,
+  fd: FormData,
+): Promise<ActionResponse<ValidateBookErrors>> {
+  try {
+    const bookPayload = {
+      title: fd.get('title') as string,
+      description: fd.get('description') as string,
+      price: parseFloat(fd.get('price') as string),
+      pageLength: parseInt(fd.get('pageLength') as string),
+      type: fd.get('type') as string,
+      publishDate: new Date(fd.get('publishDate') as string),
+      authorId: fd.get('authorId') as string,
+      coverUrl: fd.get('coverUrl') as string,
+      publisherId: fd.get('publisherId') as string,
+      categoryId: fd.get('categoryId') as string,
+      cover: fd.get('cover') as File,
+    };
+
+    const validatedFields = z
+      .object({
+        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        description: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        price: z
+          .number({ message: 'Обовʼязкове поле' })
+          .min(0.01, { message: 'Ціна повинна бути більше 0' }),
+        pageLength: z
+          .number({ message: 'Обовʼязкове поле' })
+          .min(1, { message: 'Сторінок повинно бути більше 0' }),
+        type: z.nativeEnum(BookType),
+        publishDate: z.date(),
+        authorId: z.string().trim().min(1),
+        publisherId: z.string().trim().min(1),
+        categoryId: z.string().trim().min(1),
+      })
+      .safeParse(bookPayload);
+
+    if (!validatedFields.success) {
+      return {
+        status: 400,
+        message: 'Перевірте правильність введених даних',
+        errors: validatedFields.error?.flatten().fieldErrors,
+      };
+    }
+    let coverUrl: string | undefined = undefined;
+
+    if (bookPayload.cover && bookPayload.cover.size > 0) {
+      const blob = await put(
+        `images/${bookPayload.cover.name}`,
+        bookPayload.cover,
+        {
+          access: 'public',
+          addRandomSuffix: true,
+        },
+      );
+
+      coverUrl = blob.url;
+    } else {
+      coverUrl = bookPayload.coverUrl;
+    }
+
+    const {
+      title,
+      description,
+      price,
+      pageLength,
+      type,
+      categoryId,
+      publisherId,
+      authorId,
+      publishDate,
+    } = bookPayload;
+    const bookType = bookTypeFromString(type);
+
+    await prisma?.book.update({
+      where: { id: bookId },
+      data: {
+        title: {
+          set: title,
+        },
+        description: {
+          set: description,
+        },
+        price: {
+          set: price,
+        },
+        pageLength: {
+          set: pageLength,
+        },
+        type: {
+          set: bookType ?? undefined,
+        },
+        publishDate: {
+          set: publishDate,
+        },
+        authorId: {
+          set: authorId,
+        },
+        publisherId: {
+          set: publisherId,
+        },
+        categoryId: {
+          set: categoryId,
+        },
+        ...(coverUrl && {
+          coverUrl: {
+            set: coverUrl,
+          },
+        }),
+      },
+    });
+
+    revalidatePath(`/admin/catalog`);
+
+    return {
+      status: 204,
+      message: 'Ок',
+    };
+  } catch (e) {
+    console.error(e);
+
+    return {
+      status: 500,
+      message: 'Internal server error',
+    };
+  }
+}
+
+const MAX_FILE_SIZE = 5000000;
+const ACCEPTED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+];
+
+export async function createBook(
+  fd: FormData,
+): Promise<ActionResponse<ValidateBookErrors>> {
+  try {
+    const bookPayload = {
+      cover: fd.get('cover') as File,
+      title: fd.get('title') as string,
+      description: fd.get('description') as string,
+      price: parseFloat(fd.get('price') as string),
+      pageLength: parseInt(fd.get('pageLength') as string),
+      type: fd.get('type') as string,
+      coverUrl: fd.get('coverUrl') as string,
+      publishDate: new Date(fd.get('publishDate') as string),
+      authorId: fd.get('authorId') as string,
+      authorName: fd.get('authorName') as string,
+      publisherId: fd.get('publisherId') as string,
+      publisherName: fd.get('publisherName') as string,
+      categoryId: fd.get('categoryId') as string,
+      categoryTitle: fd.get('categoryTitle') as string,
+    };
+
+    const validatedFields = z
+      .object({
+        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        description: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        price: z
+          .number({ message: 'Обовʼязкове поле' })
+          .min(0.01, { message: 'Ціна повинна бути більше 0' }),
+        pageLength: z
+          .number({ message: 'Обовʼязкове поле' })
+          .min(1, { message: 'Сторінок повинно бути більше 0' }),
+        type: z.nativeEnum(BookType),
+        publishDate: z.date(),
+        cover: z
+          .any()
+          .refine(
+            (file) => file?.size <= MAX_FILE_SIZE,
+            `Максимальний розмір зображення 5MB.`,
+          )
+          .refine(
+            (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
+            'Підтримуються тільки формати .jpg, .jpeg, .png and .webp',
+          ),
+      })
+      .safeParse(bookPayload);
+
+    if (!validatedFields.success) {
+      return {
+        status: 400,
+        message: 'Перевірте правильність введених даних',
+        errors: validatedFields.error?.flatten().fieldErrors,
+      };
+    }
+    let coverUrl: string | undefined = undefined;
+
+    if (bookPayload.cover) {
+      const blob = await put(
+        `images/${bookPayload.cover.name}`,
+        bookPayload.cover,
+        {
+          access: 'public',
+          addRandomSuffix: true,
+        },
+      );
+
+      coverUrl = blob.url;
+    }
+
+    const { title, description, price, pageLength, type, publishDate } =
+      bookPayload;
+    const bookType = bookTypeFromString(type);
+
+    await prisma?.book.create({
+      include: {
+        author: true,
+        publisher: true,
+        category: true,
+      },
+      data: {
+        coverUrl: coverUrl,
+        title: title,
+        description: description,
+        price: price,
+        pageLength: pageLength,
+        type: bookType!,
+        publishDate: publishDate,
+        author: {
+          connectOrCreate: {
+            where: {
+              id: bookPayload.authorId,
+            },
+            create: {
+              name: bookPayload.authorName,
+            },
+          },
+        },
+        publisher: {
+          connectOrCreate: {
+            where: {
+              id: bookPayload.publisherId,
+            },
+            create: {
+              name: bookPayload.publisherName,
+            },
+          },
+        },
+        category: {
+          connectOrCreate: {
+            where: {
+              id: bookPayload.categoryId,
+            },
+            create: {
+              title: bookPayload.categoryTitle,
+            },
+          },
+        },
+      },
+    });
+
+    revalidatePath(`/admin/catalog`);
+
+    return {
+      status: 201,
+      message: 'Ок',
+    };
+  } catch (e) {
+    console.error(e);
+
+    return {
+      status: 500,
+      message: 'Internal server error',
+    };
   }
 }

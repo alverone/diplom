@@ -1,3 +1,4 @@
+import { BookType } from '@prisma/client';
 import { SortOrder } from './data';
 
 export const formatCurrency = (amount: number, useSymbol = false) => {
@@ -62,6 +63,21 @@ export function sortOrderFromString(sortOrder: string | undefined | null) {
       return SortOrder.TitleAsc;
     case 'title_desc':
       return SortOrder.TitleDesc;
+    default:
+      return null;
+  }
+}
+
+export function bookTypeFromString(bookType: string | undefined | null) {
+  if (!bookType) {
+    return null;
+  }
+
+  switch (bookType) {
+    case 'ELECTRONIC':
+      return BookType.ELECTRONIC;
+    case 'PAPER':
+      return BookType.PAPER;
     default:
       return null;
   }

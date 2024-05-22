@@ -536,6 +536,19 @@ export async function fetchOrdersPagesCount(userId: string) {
   }
 }
 
+export async function fetchAllOrdersPagesCount() {
+  try {
+    const orderCount = await prisma?.order.count();
+
+    const numberOfPages = Number(orderCount ?? '0') / 10;
+
+    return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
+  } catch (e) {
+    console.error('DatabaseError:', e);
+    return 1;
+  }
+}
+
 export async function fetchOrders(currentPage: number, userId: string) {
   try {
     const limit = 10;
@@ -543,6 +556,29 @@ export async function fetchOrders(currentPage: number, userId: string) {
 
     const orders = await prisma?.order.findMany({
       where: { userId: userId },
+      take: limit,
+      skip: offset,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!orders) {
+      return [];
+    } else {
+      return orders as Order[];
+    }
+  } catch (e) {
+    console.error('DatabaseError:', e);
+
+    return [];
+  }
+}
+
+export async function fetchAllOrders(currentPage: number) {
+  try {
+    const limit = 10;
+    const offset = (currentPage - 1) * limit;
+
+    const orders = await prisma?.order.findMany({
       take: limit,
       skip: offset,
       orderBy: { createdAt: 'desc' },
@@ -740,52 +776,6 @@ export type BookPayload = {
   publisherId?: string;
   categoryId?: string;
 };
-
-export async function updateBook(bookId: string, payload: BookPayload) {
-  try {
-    const updatedBook = await prisma?.book.update({
-      where: { id: bookId },
-      data: {
-        title: {
-          set: payload.title,
-        },
-        description: {
-          set: payload.title,
-        },
-        price: {
-          set: payload.price,
-        },
-        pageLength: {
-          set: payload.pageLength,
-        },
-        type: {
-          set: payload.type,
-        },
-        coverUrl: {
-          set: payload.coverUrl,
-        },
-        authorId: {
-          set: payload.authorId,
-        },
-        publisherId: {
-          set: payload.publisherId,
-        },
-        categoryId: {
-          set: payload.categoryId,
-        },
-      },
-    });
-
-    if (!updatedBook) {
-      return null;
-    } else {
-      return updatedBook as Book;
-    }
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return null;
-  }
-}
 
 /*export async function createBook(payload: BookPayload) {
   try {

@@ -4,33 +4,33 @@ import AppInput from '@/components/AppInput';
 import AppTextarea from '@/components/AppTextarea';
 import { ButtonPrimary } from '@/components/Buttons';
 import {
-  ActionResponse,
-  createCategory,
-  ValidateCategoryErrors,
+	ActionResponse,
+	createPublisher,
+	ValidateAuthorErrors,
 } from '@/lib/action';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
-export default function CreateCategoryForm() {
+export default function CreatePublisherForm() {
   const router = useRouter();
   const [formState, setFormState] = useState<
-    ActionResponse<ValidateCategoryErrors>
+    ActionResponse<ValidateAuthorErrors>
   >({});
 
   async function action(fd: FormData) {
-    const res = await createCategory(fd);
+    const res = await createPublisher(fd);
 
     if (res.status == 204) {
       setFormState({});
-      router.push('/admin/categories');
+      router.push('/admin/publishers');
     } else {
       setFormState(res);
     }
   }
 
   const { message, errors } = formState;
-  const titleError = errors?.title?.at(0);
+  const nameError = errors?.name?.at(0);
 
   return (
     <form
@@ -38,22 +38,22 @@ export default function CreateCategoryForm() {
       className="flex max-h-full w-full max-w-2xl flex-col gap-y-5"
     >
       <h2 className="mb-1 text-lg font-semibold text-neutral-950 sm:text-xl md:text-2xl">
-        Нова категорія
+        Нове видавництво
       </h2>
 
       <AppInput
         label="Назва *"
         type="text"
-        name="title"
-        id="title"
-        placeholder="Назва категорії"
-        error={titleError}
+        name="name"
+        id="name"
+        placeholder="Назва видавництва"
+        error={nameError}
       />
       <AppTextarea
-        label="Опис категорії"
+        label="Опис видавництва"
         name="description"
         id="description"
-        placeholder="Опис категорії..."
+        placeholder="Опис видавництва..."
         rows={4}
       />
 

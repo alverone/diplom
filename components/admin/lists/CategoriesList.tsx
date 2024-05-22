@@ -13,7 +13,7 @@ export default function CategoriesList({
       editUrl={`/admin/categories/${c.id}`}
       key={c.id}
       onDeleteCallback={() => deleteCategory(c.id)}
-      deleteTitle="Видалити категорію"
+      deleteTitle={c.title}
       deleteDescription="Ви впевнені, що хочете видалити цю категорію?"
     >
       <div className="flex flex-row items-center gap-x-4">

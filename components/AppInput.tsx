@@ -53,7 +53,6 @@ export default function AppInput({
           {...rest}
         />
       )) || <input className={inputClass} {...rest} />}
-      {children}
       {error ? <ErrorLabel error={error} /> : children}
     </>
   );

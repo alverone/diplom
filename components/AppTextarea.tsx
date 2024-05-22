@@ -5,6 +5,7 @@ interface AppTextareaProps extends ComponentPropsWithoutRef<'textarea'> {
   wrapperClassName?: string;
   children?: React.ReactNode;
   defaultValue?: string;
+  error?: string | null;
 }
 
 export default function AppTextarea({
@@ -12,6 +13,7 @@ export default function AppTextarea({
   label,
   wrapperClassName,
   defaultValue,
+  error,
   ...rest
 }: AppTextareaProps) {
   const textareaClass =
@@ -24,6 +26,7 @@ export default function AppTextarea({
         <textarea className={textareaClass} {...rest}>
           {defaultValue}
         </textarea>
+        {error ? <ErrorLabel error={error} /> : children}
       </div>
     );
   }
@@ -45,6 +48,14 @@ function TextareaLabel({
   return (
     <label className="mb-2 block text-base font-semibold" htmlFor={name}>
       {text}
+    </label>
+  );
+}
+
+function ErrorLabel({ error }: { error: string }) {
+  return (
+    <label className="mt-1.5 block text-sm font-medium text-red-500">
+      {error}
     </label>
   );
 }

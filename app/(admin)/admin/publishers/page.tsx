@@ -1,14 +1,12 @@
-import { ButtonPrimary } from '@/components/Buttons';
-
+import CreateButton from '@/components/admin/CreateButton';
+import PublishersList from '@/components/admin/lists/PublishersList';
 import Pagination from '@/components/Pagination';
 import {
   CatalogBookLimit,
   fetchPublishersCount,
   fetchPublishersPaginated,
 } from '@/lib/data';
-import { PlusIcon } from '@heroicons/react/20/solid';
 import { redirect } from 'next/navigation';
-import PublishersList from './PublishersList';
 
 export default async function Page({
   searchParams,
@@ -33,10 +31,7 @@ export default async function Page({
     <>
       <div className="mb-6 flex flex-row items-end justify-between ">
         <h1 className="text-2xl font-semibold text-neutral-950">Видавництва</h1>
-        <ButtonPrimary
-          label="Створити"
-          icon={<PlusIcon width={20} height={20} />}
-        />
+        <CreateButton />
       </div>
       <div className="mb-6 flex flex-col gap-y-4">
         <PublishersList publishers={publishers} />

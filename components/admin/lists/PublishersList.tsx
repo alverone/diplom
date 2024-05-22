@@ -13,7 +13,7 @@ export default function PublishersList({
       editUrl={`/admin/publishers/${p.id}`}
       key={p.id}
       onDeleteCallback={() => deletePublisher(p.id)}
-      deleteTitle="Видалити видавництво"
+      deleteTitle={p.name}
       deleteDescription="Ви впевнені, що хочете видалити це видавництво?"
     >
       <div className="flex flex-row items-center gap-x-4">
