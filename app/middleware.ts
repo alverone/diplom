@@ -21,6 +21,8 @@ export async function middleware(req: NextRequest) {
   } else if (!canEnterAdmin && isAdminRoute) {
     return NextResponse.redirect(new URL('/login?fromAdmin=true', req.url));
   }
+
+  return NextResponse.next();
 }
 
 export const config = {
