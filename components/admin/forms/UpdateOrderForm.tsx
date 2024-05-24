@@ -3,7 +3,7 @@
 import AppInput from '@/components/AppInput';
 import AppTextarea from '@/components/AppTextarea';
 import { ButtonPrimary, ButtonSecondary } from '@/components/Buttons';
-import { ActionResponse, updateOrder, ValidateOrderErrors } from '@/lib/action';
+import { ActionResponse, updateOrder } from '@/lib/action';
 import { formatDateToLocal } from '@/lib/utils';
 import { OrderStatus } from '@prisma/client';
 import Image from 'next/image';
@@ -17,9 +17,7 @@ export default function UpdateOrderForm({
   books: Book[] | undefined | null;
   order: Order;
 }) {
-  const [formState, setFormState] = useState<
-    ActionResponse<ValidateOrderErrors>
-  >({});
+  const [formState, setFormState] = useState<ActionResponse>({});
 
   async function action(fd: FormData) {
     const res = await updateOrder(fd);

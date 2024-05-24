@@ -66,11 +66,11 @@ export default function Page() {
 
   return (
     <main>
-      <div className="laptop:flex-row laptop:items-start flex w-full flex-col-reverse items-center justify-center gap-6 py-4 lg:gap-x-8 xl:gap-x-12">
+      <div className="flex w-full flex-col-reverse items-center justify-center gap-6 py-4 laptop:flex-row laptop:items-start lg:gap-x-8 xl:gap-x-12">
         <CheckoutForm onSuccess={() => setSuccess(true)} />
 
         <div className="flex h-auto w-full flex-col">
-          <h2 className="laptop:inline laptop:visible invisible mb-4 hidden text-2xl font-semibold text-neutral-950">
+          <h2 className="invisible mb-4 hidden text-2xl font-semibold text-neutral-950 laptop:visible laptop:inline">
             4. Замовлення:
           </h2>
           <div className="flex h-auto w-full flex-col gap-y-4 rounded-md border-2 border-neutral-200 p-3 xs:p-6 sm:min-w-[420px]">

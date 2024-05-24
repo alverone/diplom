@@ -1,7 +1,7 @@
 import BookActions from '@/components/BookActions';
 import BookEdition from '@/components/BookEdition';
 import { getAppSession } from '@/lib/auth';
-import { fetchBookById } from '@/lib/data';
+import { getBookDetails } from '@/lib/data';
 import prisma from '@/lib/prisma';
 import { formatCurrency } from '@/lib/utils';
 import Image from 'next/image';
@@ -16,7 +16,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   const bookId = params.id;
 
   const [book, user] = await Promise.all([
-    fetchBookById(bookId),
+    getBookDetails(bookId),
     prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, wishesIds: true },

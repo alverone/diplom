@@ -3,18 +3,12 @@
 import AppInput from '@/components/AppInput';
 import AppTextarea from '@/components/AppTextarea';
 import { ButtonPrimary, ButtonSecondary } from '@/components/Buttons';
-import {
-  ActionResponse,
-  updateAuthor,
-  ValidateAuthorErrors,
-} from '@/lib/action';
+import { ActionResponse, updateAuthor } from '@/lib/action';
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
 export default function UpdateAuthorForm({ author }: { author: Author }) {
-  const [formState, setFormState] = useState<
-    ActionResponse<ValidateAuthorErrors>
-  >({});
+  const [formState, setFormState] = useState<ActionResponse>({});
 
   async function action(fd: FormData) {
     const { name, description } = {

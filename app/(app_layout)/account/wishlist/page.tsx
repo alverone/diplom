@@ -1,22 +1,22 @@
 import BooksGrid from '@/components/BooksGrid';
 import LoadingView from '@/components/LoadingView';
 import { getAppSession } from '@/lib/auth';
-import { fetchWishedBooks, fetchWishedBooksCount } from '@/lib/data';
+import { getUserWishedBooks } from '@/lib/data';
 import { sortOrderFromString } from '@/lib/utils';
 import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 export default async function Page({ searchParams }: PaginatedSearchParams) {
-  const { page } = searchParams;
-  const currentPage = Number(page ?? '1');
   const session = await getAppSession();
+  const currentPage = Number(searchParams.page ?? '1');
   const userId = session?.user?.id ?? '';
   const sortOrder = sortOrderFromString(searchParams.sortOrder);
 
-  const [pageCount, books] = await Promise.all([
-    fetchWishedBooksCount(userId),
-    fetchWishedBooks(currentPage, userId, sortOrderFromString(sortOrder)),
-  ]);
+  const { data: books, count: pageCount } = await getUserWishedBooks(
+    currentPage,
+    userId,
+    sortOrder,
+  );
 
   if (currentPage > pageCount) {
     redirect('/account/wishlist');

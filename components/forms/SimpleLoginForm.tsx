@@ -1,14 +1,12 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import AppInput from '../AppInput';
 import { ButtonPrimary } from '../Buttons';
 
-export default function SimpleLoginForm({ onLogin }: { onLogin?: () => void }) {
-  const router = useRouter();
+export default function SimpleLoginForm() {
   const [pending, setIsPending] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,13 +29,12 @@ export default function SimpleLoginForm({ onLogin }: { onLogin?: () => void }) {
     const result = await signIn('credentials', {
       redirect: false,
       password: password,
+
       email: email,
     });
-
     if (result?.ok ?? false) {
       setErrorMessage(null);
-      router.refresh();
-      onLogin && onLogin();
+      //onLogin && onLogin();
     } else {
       setErrorMessage('Перевірте правильність введених даних');
     }

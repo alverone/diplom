@@ -1,9 +1,9 @@
-import { fetchAllPublishers } from '@/lib/data';
+import { getAllPublishers } from '@/lib/data';
 import Link from 'next/link';
 import styles from './styles.module.css';
 
 export default async function Page() {
-  const publishers = await fetchAllPublishers();
+  const publishers = await getAllPublishers();
 
   if (!publishers || publishers.length == 0) {
     return (

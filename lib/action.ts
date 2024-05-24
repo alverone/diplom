@@ -1,23 +1,26 @@
 'use server';
-import { del, put } from '@vercel/blob';
 
+import { BookType, OrderStatus } from '@prisma/client';
+import { del, put } from '@vercel/blob';
 import { hashSync } from 'bcrypt';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-
-import { BookType, OrderStatus } from '@prisma/client';
-
 import { getAppSession } from './auth';
 import prisma from './prisma';
 import { bookTypeFromString, orderStatusFromString } from './utils';
+
+const requiredZodString = z
+  .string()
+  .trim()
+  .min(1, { message: 'Обовʼязкове поле' });
 
 const createSchema = z.object({
   email: z.string().email({ message: 'Невірний email' }),
   password: z
     .string()
     .min(8, { message: 'Пароль повинен містити не менше 8 символів' }),
-  name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
-  surname: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+  name: requiredZodString,
+  surname: requiredZodString,
   phone: z
     .string({
       required_error: 'Обовʼязкове поле',
@@ -27,8 +30,8 @@ const createSchema = z.object({
 
 const updateSchema = z.object({
   email: z.string().email({ message: 'Невірний email' }),
-  name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
-  surname: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+  name: requiredZodString,
+  surname: requiredZodString,
   phone: z
     .string({
       required_error: 'Обовʼязкове поле',
@@ -38,81 +41,23 @@ const updateSchema = z.object({
 
 const makeOrderSchema = z.object({
   email: z.string().email({ message: 'Невірний email' }),
-  name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
-  surname: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+  name: requiredZodString,
+  surname: requiredZodString,
   phone: z
     .string({
       required_error: 'Обовʼязкове поле',
     })
     .min(1),
-  address: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+  address: requiredZodString,
 });
 
-export interface ActionResponse<T> {
+export interface ActionResponse {
   message?: string;
   status?: number;
-  errors?: T | undefined;
+  errors?: FormErrors | undefined;
 }
 
-export interface CreateUserErrors {
-  email?: string[] | undefined;
-  password?: string[] | undefined;
-  phone?: string[] | undefined;
-  name?: string[] | undefined;
-  surname?: string[] | undefined;
-}
-
-export interface UpdateUserErrors {
-  email?: string[] | undefined;
-  phone?: string[] | undefined;
-  name?: string[] | undefined;
-  surname?: string[] | undefined;
-}
-
-export interface MakeOrderErrors {
-  name?: string[] | undefined;
-  surname?: string[] | undefined;
-  phone?: string[] | undefined;
-  email?: string[] | undefined;
-  address?: string[] | undefined;
-}
-
-export interface ValidateCategoryErrors {
-  title?: string[] | undefined;
-}
-export interface ValidateAuthorErrors {
-  name?: string[] | undefined;
-}
-export interface ValidatePublisherErrors {
-  name?: string[] | undefined;
-}
-
-export interface ValidateOrderErrors {
-  address?: string[] | undefined;
-  id?: string[] | undefined;
-  description?: string[] | undefined;
-  price?: string[] | undefined;
-  status?: string[] | undefined;
-  email?: string[] | undefined;
-  fullName?: string[] | undefined;
-  phone?: string[] | undefined;
-  userId?: string[] | undefined;
-}
-
-export interface ValidateBookErrors {
-  type?: string[] | undefined;
-  title?: string[] | undefined;
-  description?: string[] | undefined;
-  price?: string[] | undefined;
-  pageLength?: string[] | undefined;
-  cover?: string[] | undefined;
-  publishDate?: string[] | undefined;
-  authorId?: string[] | undefined;
-}
-
-export async function createUser(
-  fd: FormData,
-): Promise<ActionResponse<CreateUserErrors>> {
+export async function createUser(fd: FormData): Promise<ActionResponse> {
   try {
     const userPayload = {
       email: fd.get('email') as string,
@@ -181,7 +126,7 @@ export async function createUser(
 export async function updateUser(
   id: string,
   fd: FormData,
-): Promise<ActionResponse<UpdateUserErrors>> {
+): Promise<ActionResponse> {
   try {
     const userPayload = {
       email: fd.get('email') as string,
@@ -347,7 +292,7 @@ export async function createOrder(
   userId: string | null | undefined,
   order: BookAndCount[],
   fd: FormData,
-): Promise<ActionResponse<MakeOrderErrors>> {
+): Promise<ActionResponse> {
   try {
     const userPayload = {
       email: fd.get('email') as string,
@@ -420,9 +365,7 @@ export async function createOrder(
   }
 }
 
-export async function updateCategory(
-  fd: FormData,
-): Promise<ActionResponse<ValidateCategoryErrors>> {
+export async function updateCategory(fd: FormData): Promise<ActionResponse> {
   try {
     const categoryPayload = {
       title: fd.get('title') as string,
@@ -432,7 +375,7 @@ export async function updateCategory(
 
     const validatedFields = z
       .object({
-        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        title: requiredZodString,
       })
       .safeParse(categoryPayload);
 
@@ -472,9 +415,7 @@ export async function updateCategory(
   }
 }
 
-export async function createCategory(
-  fd: FormData,
-): Promise<ActionResponse<ValidateCategoryErrors>> {
+export async function createCategory(fd: FormData): Promise<ActionResponse> {
   try {
     const categoryPayload = {
       title: fd.get('title') as string,
@@ -483,7 +424,7 @@ export async function createCategory(
 
     const validatedFields = z
       .object({
-        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        title: requiredZodString,
       })
       .safeParse(categoryPayload);
 
@@ -520,9 +461,7 @@ export async function createCategory(
   }
 }
 
-export async function updateAuthor(
-  fd: FormData,
-): Promise<ActionResponse<ValidateAuthorErrors>> {
+export async function updateAuthor(fd: FormData): Promise<ActionResponse> {
   try {
     const authorPayload = {
       name: fd.get('name') as string,
@@ -532,7 +471,7 @@ export async function updateAuthor(
 
     const validatedFields = z
       .object({
-        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        name: requiredZodString,
       })
       .safeParse(authorPayload);
 
@@ -572,9 +511,7 @@ export async function updateAuthor(
   }
 }
 
-export async function createAuthor(
-  fd: FormData,
-): Promise<ActionResponse<ValidateAuthorErrors>> {
+export async function createAuthor(fd: FormData): Promise<ActionResponse> {
   try {
     const authorPayload = {
       name: fd.get('name') as string,
@@ -583,7 +520,7 @@ export async function createAuthor(
 
     const validatedFields = z
       .object({
-        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        name: requiredZodString,
       })
       .safeParse(authorPayload);
 
@@ -620,9 +557,7 @@ export async function createAuthor(
   }
 }
 
-export async function updatePublisher(
-  fd: FormData,
-): Promise<ActionResponse<ValidatePublisherErrors>> {
+export async function updatePublisher(fd: FormData): Promise<ActionResponse> {
   try {
     const publisherPayload = {
       name: fd.get('name') as string,
@@ -631,7 +566,7 @@ export async function updatePublisher(
     };
     const validatedFields = z
       .object({
-        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        name: requiredZodString,
       })
       .safeParse(publisherPayload);
 
@@ -671,9 +606,7 @@ export async function updatePublisher(
   }
 }
 
-export async function createPublisher(
-  fd: FormData,
-): Promise<ActionResponse<ValidatePublisherErrors>> {
+export async function createPublisher(fd: FormData): Promise<ActionResponse> {
   try {
     const publisherPayload = {
       name: fd.get('name') as string,
@@ -682,7 +615,7 @@ export async function createPublisher(
 
     const validatedFields = z
       .object({
-        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        name: requiredZodString,
       })
       .safeParse(publisherPayload);
 
@@ -799,7 +732,7 @@ export async function deleteBook(id: string): Promise<boolean> {
       },
     });
 
-    revalidatePath(`/admin/books`);
+    revalidatePath(`/admin/catalog`);
 
     return true;
   } catch (e) {
@@ -812,7 +745,7 @@ export async function deleteBook(id: string): Promise<boolean> {
 export async function updateBook(
   bookId: string,
   fd: FormData,
-): Promise<ActionResponse<ValidateBookErrors>> {
+): Promise<ActionResponse> {
   try {
     const bookPayload = {
       title: fd.get('title') as string,
@@ -830,8 +763,8 @@ export async function updateBook(
 
     const validatedFields = z
       .object({
-        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
-        description: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        title: requiredZodString,
+        description: requiredZodString,
         price: z
           .number({ message: 'Обовʼязкове поле' })
           .min(0.01, { message: 'Ціна повинна бути більше 0' }),
@@ -945,9 +878,7 @@ const ACCEPTED_IMAGE_TYPES = [
   'image/webp',
 ];
 
-export async function createBook(
-  fd: FormData,
-): Promise<ActionResponse<ValidateBookErrors>> {
+export async function createBook(fd: FormData): Promise<ActionResponse> {
   try {
     const bookPayload = {
       cover: fd.get('cover') as File,
@@ -968,8 +899,8 @@ export async function createBook(
 
     const validatedFields = z
       .object({
-        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
-        description: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        title: requiredZodString,
+        description: requiredZodString,
         price: z
           .number({ message: 'Обовʼязкове поле' })
           .min(0.01, { message: 'Ціна повинна бути більше 0' }),
@@ -1080,9 +1011,7 @@ export async function createBook(
   }
 }
 
-export async function updateOrder(
-  fd: FormData,
-): Promise<ActionResponse<ValidateOrderErrors>> {
+export async function updateOrder(fd: FormData): Promise<ActionResponse> {
   try {
     const orderPayload = {
       price: parseFloat(fd.get('price') as string),
@@ -1098,13 +1027,12 @@ export async function updateOrder(
 
     const validatedFields = z
       .object({
-        fullName: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        fullName: requiredZodString,
         email: z.string().email({ message: 'Невірний email' }),
-        phone: z.string().min(1, { message: 'Обовʼязкове поле' }),
-        address: z.string().min(1, { message: 'Обовʼязкове поле' }),
+        phone: requiredZodString,
+        address: requiredZodString,
         price: z.number().min(0.01, { message: 'Ціна повинна бути більше 0' }),
         status: z.nativeEnum(OrderStatus),
-        //userId: z.string().trim().min(1),
         id: z.number().int().positive(),
       })
       .safeParse(orderPayload);

@@ -80,7 +80,7 @@ declare global {
     id: number;
     bookIds: string[];
     price: number;
-    userId: string;
+    userId: string | null;
     status: OrderStatus;
     createdAt: Date;
     updatedAt: Date;
@@ -119,4 +119,36 @@ declare global {
     coverUrl: string | null;
     count: number;
   };
+
+  type PaginatedDataResponse<T> = {
+    data: T[];
+    count: number;
+  };
+
+  type SimpleBooksFilterInput = {
+    authorId?: string;
+    publisherId?: string;
+    categoryId?: string;
+  };
+
+  interface FormErrors {
+    email?: string[] | undefined;
+    password?: string[] | undefined;
+    phone?: string[] | undefined;
+    name?: string[] | undefined;
+    surname?: string[] | undefined;
+    address?: string[] | undefined;
+    title?: string[] | undefined;
+    id?: string[] | undefined;
+    price?: string[] | undefined;
+    description?: string[] | undefined;
+    status?: string[] | undefined;
+    userId?: string[] | undefined;
+    fullName?: string[] | undefined;
+    pageLength?: string[] | undefined;
+    cover?: string[] | undefined;
+    authorId?: string[] | undefined;
+    publishDate?: string[] | undefined;
+    type?: string[] | undefined;
+  }
 }

@@ -3,8 +3,7 @@ import CatalogList from '@/components/admin/lists/CatalogList';
 import Pagination from '@/components/Pagination';
 import {
   CatalogBookLimit,
-  fetchBookPagesCount,
-  fetchSimpleBooks,
+  fetchSimpleBooksPaginatedWithCount,
 } from '@/lib/data';
 import { redirect } from 'next/navigation';
 
@@ -18,13 +17,15 @@ export default async function Page({
   const { page } = searchParams;
   const currentPage = Number(page ?? '1');
 
-  const [books, pageCount] = await Promise.all([
-    fetchSimpleBooks(currentPage, null, CatalogBookLimit.Admin),
-    fetchBookPagesCount(CatalogBookLimit.Admin),
-  ]);
+  const { data: books, count: pageCount } =
+    await fetchSimpleBooksPaginatedWithCount(
+      currentPage,
+      null,
+      CatalogBookLimit.ADMIN,
+    );
 
   if (currentPage > pageCount) {
-    redirect('/admin/catalog');
+    redirect('/admin/catalog?page=1');
   }
 
   return (

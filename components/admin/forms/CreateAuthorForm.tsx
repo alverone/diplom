@@ -3,20 +3,14 @@
 import AppInput from '@/components/AppInput';
 import AppTextarea from '@/components/AppTextarea';
 import { ButtonPrimary } from '@/components/Buttons';
-import {
-  ActionResponse,
-  createAuthor,
-  ValidateAuthorErrors,
-} from '@/lib/action';
+import { ActionResponse, createAuthor } from '@/lib/action';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
 export default function CreateAuthorForm() {
   const router = useRouter();
-  const [formState, setFormState] = useState<
-    ActionResponse<ValidateAuthorErrors>
-  >({});
+  const [formState, setFormState] = useState<ActionResponse>({});
 
   async function action(fd: FormData) {
     const res = await createAuthor(fd);

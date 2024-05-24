@@ -1,25 +1,21 @@
 import BooksGrid from '@/components/BooksGrid';
 import Pagination from '@/components/Pagination';
-
-import {
-  fetchSimpleBooksFiltered,
-  fetchSimpleFilteredBooksCount,
-} from '@/lib/data';
+import { getPaginatedFilteredSimpleBooks } from '@/lib/data';
+import { sortOrderFromString } from '@/lib/utils';
 import { redirect, RedirectType } from 'next/navigation';
 import { Suspense } from 'react';
 
 export default async function Page({
   searchParams,
 }: {
-  searchParams: { query: string; page?: string };
+  searchParams: { query: string; page?: string; sortOrder?: string };
 }) {
   const query = searchParams.query?.trim() ?? '';
   const currentPage = Number(searchParams.page || '1');
+  const sortOrder = sortOrderFromString(searchParams.sortOrder);
 
-  const [pageCount, books] = await Promise.all([
-    fetchSimpleFilteredBooksCount(query),
-    fetchSimpleBooksFiltered(query, currentPage),
-  ]);
+  const { data: books, count: pageCount } =
+    await getPaginatedFilteredSimpleBooks(query, currentPage, sortOrder);
 
   if (currentPage > pageCount) {
     redirect(`/search?query=${query}`, RedirectType.replace);

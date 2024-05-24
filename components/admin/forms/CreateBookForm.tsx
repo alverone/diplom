@@ -4,7 +4,7 @@ import AppFormSelect from '@/components/AppFormSelect';
 import AppInput from '@/components/AppInput';
 import AppTextarea from '@/components/AppTextarea';
 import { ButtonPrimary } from '@/components/Buttons';
-import { ActionResponse, createBook, ValidateBookErrors } from '@/lib/action';
+import { ActionResponse, createBook } from '@/lib/action';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
@@ -19,9 +19,7 @@ export default function CreateBookForm({
   categories: Category[];
 }) {
   const router = useRouter();
-  const [formState, setFormState] = useState<
-    ActionResponse<ValidateBookErrors>
-  >({});
+  const [formState, setFormState] = useState<ActionResponse>({});
 
   async function action(fd: FormData) {
     const res = await createBook(fd);

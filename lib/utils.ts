@@ -1,7 +1,7 @@
 import { BookType, OrderStatus } from '@prisma/client';
 import { SortOrder } from './data';
 
-export const formatCurrency = (amount: number, useSymbol = false) => {
+export function formatCurrency(amount: number, useSymbol = false) {
   return (
     amount.toLocaleString('en-US', {
       style: 'decimal',
@@ -9,9 +9,9 @@ export const formatCurrency = (amount: number, useSymbol = false) => {
       maximumFractionDigits: 2,
     }) + (useSymbol ? '₴' : ' грн')
   );
-};
+}
 
-export const formatDateToLocal = (date: Date, locale: string = 'uk-UA') => {
+export function formatDateToLocal(date: Date, locale: string = 'uk-UA') {
   const options: Intl.DateTimeFormatOptions = {
     day: 'numeric',
     month: 'short',
@@ -19,7 +19,13 @@ export const formatDateToLocal = (date: Date, locale: string = 'uk-UA') => {
   };
   const formatter = new Intl.DateTimeFormat(locale, options);
   return formatter.format(date);
-};
+}
+
+export function calculateTotalPages(limit: number, count: number) {
+  const numberOfPages = Number(count ?? '0') / limit;
+
+  return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
+}
 
 export function range(start: number, end: number, step = 1) {
   if (!Number.isInteger(start)) {
@@ -65,6 +71,31 @@ export function sortOrderFromString(sortOrder: string | undefined | null) {
       return SortOrder.TitleDesc;
     default:
       return null;
+  }
+}
+
+export function getSortOrder(sortOrder: SortOrder | null):
+  | {
+      [key: string]: 'asc' | 'desc';
+    }
+  | undefined {
+  if (!sortOrder) {
+    return undefined;
+  }
+
+  switch (sortOrder) {
+    case SortOrder.PriceAsc:
+      return { price: 'asc' };
+    case SortOrder.PriceDesc:
+      return { price: 'desc' };
+    case SortOrder.TitleAsc:
+      return { title: 'asc' };
+    case SortOrder.TitleDesc:
+      return { title: 'desc' };
+    case SortOrder.Time:
+      return { publishDate: 'desc' };
+    default:
+      return undefined;
   }
 }
 

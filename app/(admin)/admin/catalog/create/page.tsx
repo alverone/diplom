@@ -1,15 +1,11 @@
 import CreateBookForm from '@/components/admin/forms/CreateBookForm';
-import {
-  fetchAllAuthors,
-  fetchAllCategories,
-  fetchAllPublishers,
-} from '@/lib/data';
+import { getAllAuthors, getAllCategories, getAllPublishers } from '@/lib/data';
 
 export default async function Page() {
   const [authors, publishers, categories] = await Promise.all([
-    fetchAllAuthors(),
-    fetchAllPublishers(),
-    fetchAllCategories(),
+    getAllAuthors(),
+    getAllPublishers(),
+    getAllCategories(),
   ]);
 
   return (

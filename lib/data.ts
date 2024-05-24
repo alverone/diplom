@@ -1,5 +1,6 @@
-import { BookType } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import prisma from './prisma';
+import { calculateTotalPages, getSortOrder } from './utils';
 
 export enum SortOrder {
   PriceAsc = 'price_asc',
@@ -10,442 +11,215 @@ export enum SortOrder {
 }
 
 export enum CatalogBookLimit {
-  Default = 6,
-  Admin = 10,
+  DEFAULT = 6,
+  ADMIN = 10,
 }
 
-function getSortOrder(sortOrder: SortOrder | null):
-  | {
-      [key: string]: 'asc' | 'desc';
-    }
-  | undefined {
-  if (!sortOrder) {
-    return undefined;
-  }
+/* authors */
 
-  switch (sortOrder) {
-    case SortOrder.PriceAsc:
-      return { price: 'asc' };
-    case SortOrder.PriceDesc:
-      return { price: 'desc' };
-    case SortOrder.TitleAsc:
-      return { title: 'asc' };
-    case SortOrder.TitleDesc:
-      return { title: 'desc' };
-    case SortOrder.Time:
-      return { publishDate: 'desc' };
-    default:
-      return undefined;
-  }
-}
-
-export async function fetchAuthorById(id: string) {
+export async function getAllAuthors(): Promise<Author[]> {
   try {
-    const author = await prisma?.author.findUnique({
+    return await prisma?.author.findMany();
+  } catch (e) {
+    console.error('DatabaseError:', e);
+    return [];
+  }
+}
+
+export async function getPaginatedAuthorsWithCount(
+  currentPage: number,
+  sortOrder: SortOrder | null,
+  limit?: CatalogBookLimit | null,
+): Promise<PaginatedDataResponse<Author>> {
+  try {
+    const _limit = (limit ?? CatalogBookLimit.DEFAULT).valueOf();
+    const offset = (currentPage - 1) * _limit;
+
+    const [authorPage, count] = await prisma?.$transaction([
+      prisma?.author.findMany({
+        take: _limit,
+        skip: offset,
+        orderBy: getSortOrder(sortOrder),
+      }),
+      prisma?.author.count(),
+    ]);
+    const totalPages = calculateTotalPages(_limit, count);
+
+    return { data: authorPage, count: totalPages };
+  } catch (e) {
+    console.error('DatabaseError:', e);
+    return { data: [], count: 1 };
+  }
+}
+
+export async function getAuthorDetails(id: string) {
+  try {
+    return await prisma?.author.findUnique({
       where: { id: id },
     });
-
-    if (!author) {
-      return null;
-    } else {
-      return author as Author;
-    }
   } catch (e) {
     console.error('DatabaseError:', e);
     return null;
   }
 }
 
-export async function fetchAllAuthors(): Promise<Author[]> {
-  try {
-    const authors = await prisma?.author.findMany();
+/* end authors */
 
-    if (!authors) {
-      return [];
-    } else {
-      return authors as Author[];
-    }
+/* publishers */
+
+export async function getAllPublishers(): Promise<Publisher[]> {
+  try {
+    return await prisma?.publisher.findMany();
   } catch (e) {
     console.error('DatabaseError:', e);
     return [];
   }
 }
 
-export async function fetchAuthorsPaginated(
+export async function getPaginatedPublishersWithCount(
   currentPage: number,
   sortOrder: SortOrder | null,
   limit?: CatalogBookLimit | null,
-) {
+): Promise<PaginatedDataResponse<Publisher>> {
   try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
+    const _limit = (limit ?? CatalogBookLimit.DEFAULT).valueOf();
     const offset = (currentPage - 1) * _limit;
 
-    const authorPage = await prisma?.author.findMany({
-      take: _limit,
-      skip: offset,
-      select: {
-        id: true,
-        name: true,
-        description: true,
-      },
-      orderBy: getSortOrder(sortOrder),
-    });
+    const [publisherPage, count] = await prisma?.$transaction([
+      prisma?.publisher.findMany({
+        take: _limit,
+        skip: offset,
+        orderBy: getSortOrder(sortOrder),
+      }),
+      prisma?.publisher.count(),
+    ]);
+    const totalPages = calculateTotalPages(_limit, count);
 
-    if (!authorPage) {
-      return [];
-    } else {
-      return authorPage as Author[];
-    }
+    return { data: publisherPage, count: totalPages };
   } catch (e) {
     console.error('DatabaseError:', e);
-    return [];
+    return { data: [], count: 1 };
   }
 }
 
-export async function fetchPublisherById(id: string) {
+export async function getPublisherDetails(
+  id: string,
+): Promise<Publisher | null> {
   try {
-    const publisher = await prisma?.publisher.findUnique({
+    return await prisma?.publisher.findUnique({
       where: { id: id },
     });
-
-    if (!publisher) {
-      return null;
-    } else {
-      return publisher as Publisher;
-    }
   } catch (e) {
     console.error('DatabaseError:', e);
     return null;
   }
 }
 
-export async function fetchPublishersPaginated(
+/* end publishers */
+
+/* categories */
+
+export async function getAllCategories(): Promise<Category[]> {
+  try {
+    return await prisma?.category.findMany();
+  } catch (e) {
+    console.error('DatabaseError:', e);
+    return [];
+  }
+}
+
+export async function getPaginatedCategoriesWithCount(
   currentPage: number,
   sortOrder: SortOrder | null,
   limit?: CatalogBookLimit | null,
-) {
+): Promise<PaginatedDataResponse<Category>> {
   try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
+    const _limit = (limit ?? CatalogBookLimit.DEFAULT).valueOf();
     const offset = (currentPage - 1) * _limit;
 
-    const publisherPage = await prisma?.publisher.findMany({
-      take: _limit,
-      skip: offset,
-      select: {
-        id: true,
-        name: true,
-        description: true,
-      },
-      orderBy: getSortOrder(sortOrder),
-    });
+    const [categoryPage, count] = await prisma?.$transaction([
+      prisma?.category.findMany({
+        take: _limit,
+        skip: offset,
+        orderBy: getSortOrder(sortOrder),
+      }),
+      prisma?.category.count(),
+    ]);
+    const totalPages = calculateTotalPages(_limit, count);
 
-    if (!publisherPage) {
-      return [];
-    } else {
-      return publisherPage as Publisher[];
-    }
+    return { data: categoryPage, count: totalPages };
   } catch (e) {
     console.error('DatabaseError:', e);
-    return [];
+    return { data: [], count: 1 };
   }
 }
 
-export async function fetchAllPublishers(): Promise<Publisher[]> {
+export async function getCategoryDetails(id: string): Promise<Category | null> {
   try {
-    const publishers = await prisma?.publisher.findMany();
-
-    if (!publishers) {
-      return [];
-    } else {
-      return publishers as Publisher[];
-    }
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return [];
-  }
-}
-
-export async function fetchCategoryById(id: string): Promise<Category | null> {
-  try {
-    const category = await prisma?.category.findUnique({
+    return await prisma?.category.findUnique({
       where: { id: id },
     });
-
-    if (!category) {
-      return null;
-    } else {
-      return category as Category;
-    }
   } catch (e) {
     console.error('DatabaseError:', e);
     return null;
   }
 }
 
-export async function fetchAllCategories(): Promise<Category[]> {
-  try {
-    const categories = await prisma?.category.findMany();
+/* end categories */
 
-    if (!categories) {
-      return [];
-    } else {
-      return categories as Category[];
-    }
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return [];
-  }
-}
+/* books */
 
-export async function fetchCategoriesPaginated(
+export async function fetchSimpleBooksPaginatedWithCount(
   currentPage: number,
   sortOrder: SortOrder | null,
   limit?: CatalogBookLimit | null,
-) {
+  filterInput?: SimpleBooksFilterInput,
+): Promise<PaginatedDataResponse<BookSimplified>> {
   try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
+    const _limit = (limit ?? CatalogBookLimit.DEFAULT).valueOf();
     const offset = (currentPage - 1) * _limit;
+    const { authorId, publisherId, categoryId } = filterInput ?? {};
 
-    const categoryPage = await prisma?.category.findMany({
-      take: _limit,
-      skip: offset,
-      select: {
-        id: true,
-        title: true,
-        description: true,
-      },
-      orderBy: getSortOrder(sortOrder),
-    });
+    const [bookPage, count] = await prisma?.$transaction([
+      prisma?.book.findMany({
+        take: _limit,
+        skip: offset,
+        where: {
+          publisherId: publisherId,
+          categoryId: categoryId,
+          authorId: authorId,
+        },
+        select: {
+          id: true,
+          type: true,
+          price: true,
+          coverUrl: true,
+          authorId: true,
+          author: true,
+          title: true,
+        },
+        orderBy: getSortOrder(sortOrder),
+      }),
+      prisma?.book.count({
+        where: {
+          publisherId: publisherId,
+          categoryId: categoryId,
+          authorId: authorId,
+        },
+      }),
+    ]);
+    const totalPages = calculateTotalPages(_limit, count);
 
-    if (!categoryPage) {
-      return [];
-    } else {
-      return categoryPage as Category[];
-    }
+    return { data: bookPage, count: totalPages };
   } catch (e) {
     console.error('DatabaseError:', e);
-    return [];
+    return { data: [], count: 1 };
   }
 }
 
-export async function fetchSimpleBooks(
-  currentPage: number,
-  sortOrder: SortOrder | null,
-  limit?: CatalogBookLimit | null,
-) {
+export async function getBookDetails(id: string): Promise<Book | null> {
   try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const offset = (currentPage - 1) * _limit;
-
-    const bookPage = await prisma?.book.findMany({
-      take: _limit,
-      skip: offset,
-      select: {
-        id: true,
-        type: true,
-        price: true,
-        coverUrl: true,
-        authorId: true,
-        author: true,
-        title: true,
-      },
-      orderBy: getSortOrder(sortOrder),
-    });
-
-    if (!bookPage) {
-      return [];
-    } else {
-      return bookPage as BookSimplified[];
-    }
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return [];
-  }
-}
-
-export async function fetchSimpleBooksByAuthor(
-  currentPage: number,
-  authorId: string,
-  sortOrder: SortOrder | null,
-  limit?: CatalogBookLimit | null,
-) {
-  try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const offset = (currentPage - 1) * _limit;
-
-    const bookPage = await prisma?.book.findMany({
-      where: {
-        authorId: authorId,
-      },
-      take: _limit,
-      skip: offset,
-      select: {
-        id: true,
-        type: true,
-        price: true,
-        coverUrl: true,
-        authorId: true,
-        author: true,
-        title: true,
-      },
-      orderBy: getSortOrder(sortOrder),
-    });
-
-    if (!bookPage) {
-      return [];
-    } else {
-      return bookPage as BookSimplified[];
-    }
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return [];
-  }
-}
-
-export async function fetchSimpleBooksByPublisher(
-  currentPage: number,
-  publisherId: string,
-  sortOrder: SortOrder | null,
-  limit?: CatalogBookLimit | null,
-) {
-  try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const offset = (currentPage - 1) * _limit;
-
-    const bookPage = await prisma?.book.findMany({
-      where: {
-        publisherId: publisherId,
-      },
-      take: _limit,
-      skip: offset,
-      select: {
-        id: true,
-        type: true,
-        price: true,
-        coverUrl: true,
-        authorId: true,
-        author: true,
-        title: true,
-      },
-      orderBy: getSortOrder(sortOrder),
-    });
-
-    if (!bookPage) {
-      return [];
-    } else {
-      return bookPage as BookSimplified[];
-    }
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return [];
-  }
-}
-
-export async function fetchSimpleBooksByCategory(
-  currentPage: number,
-  categoryId: string,
-  sortOrder: SortOrder | null,
-  limit?: CatalogBookLimit | null,
-) {
-  try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const offset = (currentPage - 1) * _limit;
-
-    const bookPage = await prisma?.book.findMany({
-      where: {
-        categoryId: categoryId,
-      },
-      take: _limit,
-      skip: offset,
-      select: {
-        id: true,
-        type: true,
-        price: true,
-        coverUrl: true,
-        authorId: true,
-        author: true,
-        title: true,
-      },
-      orderBy: getSortOrder(sortOrder),
-    });
-
-    if (!bookPage) {
-      return [];
-    } else {
-      return bookPage as BookSimplified[];
-    }
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return [];
-  }
-}
-
-export async function fetchSimpleBooksCountByAuthor(
-  authorId: string,
-  limit?: CatalogBookLimit | null,
-) {
-  try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const authorBooks = await prisma?.book.count({
-      where: { authorId: authorId },
-    });
-
-    const numberOfPages = authorBooks ? authorBooks / _limit : 1;
-
-    return Math.max(Math.ceil(numberOfPages), 1);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return 1;
-  }
-}
-
-export async function fetchSimpleBooksCountByPublisher(
-  publisherId: string,
-  limit?: CatalogBookLimit | null,
-) {
-  const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-  try {
-    const publisherBooks = await prisma?.book.count({
-      where: { publisherId: publisherId },
-    });
-
-    const numberOfPages = publisherBooks ? publisherBooks / _limit : 1;
-
-    return Math.max(Math.ceil(numberOfPages), 1);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return 1;
-  }
-}
-
-export async function fetchSimpleBooksCountByCategory(
-  categoryId: string,
-  limit?: CatalogBookLimit | null,
-): Promise<number> {
-  try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const categoryBooks = await prisma?.book.count({
-      where: {
-        categoryId: categoryId,
-      },
-    });
-
-    const numberOfPages = categoryBooks ? categoryBooks / _limit : 1;
-
-    if (!isFinite(numberOfPages)) {
-      return 1;
-    }
-
-    return Math.max(Math.ceil(numberOfPages), 1);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return 1;
-  }
-}
-
-export async function fetchBookById(id: string): Promise<Book | null> {
-  try {
-    const book = await prisma?.book.findUnique({
+    return await prisma?.book.findUnique({
       where: { id: id },
       include: {
         publisher: true,
@@ -453,254 +227,151 @@ export async function fetchBookById(id: string): Promise<Book | null> {
         category: true,
       },
     });
-
-    if (!book) {
-      return null;
-    } else {
-      return book as Book;
-    }
   } catch (e) {
     console.error('DatabaseError:', e);
     return null;
   }
 }
 
-export async function fetchBookPagesCount(limit?: CatalogBookLimit | null) {
+/* end books */
+
+/* orders */
+
+export async function getPaginatedOrdersWithCount(
+  currentPage: number,
+  userId?: string,
+): Promise<PaginatedDataResponse<Order>> {
   try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const bookCount = await prisma?.book.count();
-
-    const numberOfPages = Number(bookCount ?? '0') / _limit;
-
-    return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return 1;
-  }
-}
-
-export async function fetchAuthorsCount(limit?: CatalogBookLimit | null) {
-  try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const authorCount = await prisma?.author.count();
-
-    const numberOfPages = Number(authorCount ?? '0') / _limit;
-
-    return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return 1;
-  }
-}
-
-export async function fetchCategoriesCount(limit?: CatalogBookLimit | null) {
-  try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const categoryCount = await prisma?.category.count();
-
-    const numberOfPages = Number(categoryCount ?? '0') / _limit;
-
-    return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return 1;
-  }
-}
-
-export async function fetchPublishersCount(limit?: CatalogBookLimit | null) {
-  try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const publisherCount = await prisma?.publisher.count();
-
-    const numberOfPages = Number(publisherCount ?? '0') / _limit;
-
-    return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return 1;
-  }
-}
-
-export async function fetchOrdersPagesCount(userId: string) {
-  try {
-    const orderCount = await prisma?.order.count({
-      where: { userId: userId },
-    });
-
-    const numberOfPages = Number(orderCount ?? '0') / 10;
-
-    return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return 1;
-  }
-}
-
-export async function fetchAllOrdersPagesCount() {
-  try {
-    const orderCount = await prisma?.order.count();
-
-    const numberOfPages = Number(orderCount ?? '0') / 10;
-
-    return numberOfPages < 1 ? 1 : Math.ceil(numberOfPages);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return 1;
-  }
-}
-
-export async function fetchOrders(currentPage: number, userId: string) {
-  try {
-    const limit = 10;
+    const limit = CatalogBookLimit.ADMIN.valueOf();
     const offset = (currentPage - 1) * limit;
 
-    const orders = await prisma?.order.findMany({
-      where: { userId: userId },
-      take: limit,
-      skip: offset,
-      orderBy: { createdAt: 'desc' },
-    });
+    const [ordersPage, count] = await prisma?.$transaction([
+      prisma?.order.findMany({
+        where: { userId: userId },
+        take: limit,
+        skip: offset,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma?.order.count({
+        where: { userId: userId },
+      }),
+    ]);
+    const totalPages = calculateTotalPages(limit, count);
 
-    if (!orders) {
-      return [];
-    } else {
-      return orders as Order[];
-    }
+    return { data: ordersPage, count: totalPages };
   } catch (e) {
     console.error('DatabaseError:', e);
 
-    return [];
+    return { data: [], count: 1 };
   }
 }
 
-export async function fetchAllOrders(currentPage: number) {
-  try {
-    const limit = 10;
-    const offset = (currentPage - 1) * limit;
+/* end orders */
 
-    const orders = await prisma?.order.findMany({
-      take: limit,
-      skip: offset,
-      orderBy: { createdAt: 'desc' },
-    });
+/* search */
 
-    if (!orders) {
-      return [];
-    } else {
-      return orders as Order[];
-    }
-  } catch (e) {
-    console.error('DatabaseError:', e);
-
-    return [];
-  }
-}
-
-export async function fetchSimpleBooksFiltered(
+export async function getPaginatedFilteredSimpleBooks(
   term: string,
   currentPage: number,
+  sortOrder: SortOrder | null,
   limit?: CatalogBookLimit | null,
-) {
+): Promise<PaginatedDataResponse<BookSimplified>> {
   try {
     if (term.trim().length == 0) {
-      return [];
+      return { data: [], count: 1 };
     }
 
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
+    const _limit = (limit ?? CatalogBookLimit.DEFAULT).valueOf();
     const offset = (currentPage - 1) * _limit;
-    const q = `%${term}%`;
 
-    const bookPage = await prisma.$queryRaw<BookSimplifiedRaw[] | null>`
-    SELECT      books.id,
-                books.title,
-                books.price,
-                books.type,
-                books.coverUrl,
-                authors.name AS author_name,
-                authors.id AS author_id,
-                authors.description AS author_description
-    FROM        books
-    INNER JOIN  authors ON authors.id=books.author_id
-    INNER JOIN  publishers ON publishers.id=books.publisher_id
-    INNER JOIN  categories ON categories.id=books.category_id
-    WHERE       books.title ILIKE ${q} OR
-                books.description ILIKE ${q} OR
-                authors.name ILIKE ${q} OR
-                publishers.name ILIKE ${q} OR
-                categories.title ILIKE ${q}
-    ORDER BY    books.id ASC
-    LIMIT ${_limit}     OFFSET ${offset};`;
+    const orFilters = [
+      {
+        title: {
+          contains: term,
+          mode: 'insensitive',
+        },
+      },
+      {
+        description: {
+          contains: term,
+          mode: 'insensitive',
+        },
+      },
+      {
+        author: {
+          name: {
+            contains: term,
+            mode: 'insensitive',
+          },
+        },
+      },
+      {
+        category: {
+          title: {
+            contains: term,
+            mode: 'insensitive',
+          },
+        },
+      },
+      {
+        publisher: {
+          name: {
+            contains: term,
+            mode: 'insensitive',
+          },
+        },
+      },
+    ];
 
-    if (!bookPage) {
-      return [];
-    } else {
-      return bookPage.map((b) => {
-        return {
-          id: b.id,
-          title: b.title,
-          price: b.price,
-          type: b.type == 'ELECTRONIC' ? BookType.ELECTRONIC : BookType.PAPER,
-          coverUrl: b.coverUrl ?? null,
-          authorId: b.author_id,
-          author: {
-            id: b.author_id,
-            name: b.author_name,
-            description: b.author_description,
-          } as Author,
-        } as BookSimplified;
-      });
-    }
+    const [bookPage, count] = await prisma?.$transaction([
+      prisma?.book.findMany({
+        take: _limit,
+        skip: offset,
+        where: {
+          OR: orFilters as Prisma.BookWhereInput[],
+        },
+        select: {
+          id: true,
+          type: true,
+          price: true,
+          coverUrl: true,
+          authorId: true,
+          author: true,
+          title: true,
+        },
+        orderBy: getSortOrder(sortOrder),
+      }),
+      prisma?.book.count({
+        where: {
+          OR: orFilters as Prisma.BookWhereInput[],
+        },
+      }),
+    ]);
+    const totalPages = calculateTotalPages(_limit, count);
+
+    return { data: bookPage, count: totalPages };
   } catch (e) {
     console.error('DatabaseError:', e);
-    return [];
+    return { data: [], count: 1 };
   }
 }
 
-export async function fetchSimpleFilteredBooksCount(
-  term: string,
-  limit?: CatalogBookLimit | null,
-) {
-  try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const q = `%${term}%`;
+/* end search */
 
-    const books = await prisma.$queryRaw<{ count: number | string | null }[]>`
-    SELECT      COUNT(*)
-    FROM        books
-    INNER JOIN  authors ON authors.id=books.author_id
-    INNER JOIN  publishers ON publishers.id=books.publisher_id
-    INNER JOIN  categories ON categories.id=books.category_id
-    WHERE       books.title ILIKE ${q} OR
-                books.description ILIKE ${q} OR
-                authors.name ILIKE ${q} OR
-                publishers.name ILIKE ${q} OR
-                categories.title ILIKE ${q};`;
+/* wishlist */
 
-    const numberOfPages = Number(books[0].count ?? '1') / _limit;
-
-    if (!isFinite(numberOfPages)) {
-      return 1;
-    }
-
-    return Math.max(Math.ceil(numberOfPages), 1);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return 1;
-  }
-}
-
-export async function fetchWishedBooks(
+export async function getUserWishedBooks(
   currentPage: number,
   userId: string,
   sortOrder: SortOrder | null,
   limit?: CatalogBookLimit | null,
-) {
+): Promise<PaginatedDataResponse<BookSimplified>> {
   try {
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
+    const _limit = (limit ?? CatalogBookLimit.DEFAULT).valueOf();
     const offset = (currentPage - 1) * _limit;
 
     if (!userId || userId.trim().length == 0) {
-      return [];
+      return { data: [], count: 1 };
     }
 
     const user = await prisma?.user.findUnique({
@@ -709,97 +380,36 @@ export async function fetchWishedBooks(
     });
 
     if (!user || user?.wishesIds?.length == 0) {
-      return [];
+      return { data: [], count: 1 };
     }
 
-    const wishedBooks = await prisma?.book.findMany({
-      where: { id: { in: user.wishesIds } },
-      take: _limit,
-      skip: offset,
-      select: {
-        id: true,
-        type: true,
-        price: true,
-        coverUrl: true,
-        authorId: true,
-        author: true,
-        title: true,
-      },
-      orderBy: getSortOrder(sortOrder),
-    });
+    const [wishedBooksPage, count] = await prisma.$transaction([
+      prisma?.book.findMany({
+        where: { id: { in: user.wishesIds } },
+        take: _limit,
+        skip: offset,
+        select: {
+          id: true,
+          type: true,
+          price: true,
+          coverUrl: true,
+          authorId: true,
+          author: true,
+          title: true,
+        },
+        orderBy: getSortOrder(sortOrder),
+      }),
+      prisma.book.count({
+        where: { id: { in: user.wishesIds } },
+      }),
+    ]);
+    const pageCount = calculateTotalPages(_limit, count);
 
-    if (!wishedBooks) {
-      return [];
-    } else {
-      return wishedBooks as BookSimplified[];
-    }
+    return { data: wishedBooksPage, count: pageCount };
   } catch (e) {
     console.error('DatabaseError:', e);
-    return [];
+    return { data: [], count: 1 };
   }
 }
 
-export async function fetchWishedBooksCount(
-  userId: string,
-  limit?: CatalogBookLimit | null,
-) {
-  try {
-    if (!userId || userId.trim().length == 0) {
-      return 0;
-    }
-
-    const _limit = (limit ?? CatalogBookLimit.Default).valueOf();
-    const user = await prisma?.user.findUnique({
-      where: { id: userId },
-      select: { id: true, wishesIds: true },
-    });
-
-    const count = user?.wishesIds?.length;
-    const numberOfPages = count ? count / _limit : 1;
-
-    return Math.max(Math.ceil(numberOfPages), 1);
-  } catch (e) {
-    console.error('DatabaseError:', e);
-
-    return 1;
-  }
-}
-
-export type BookPayload = {
-  title?: string;
-  description?: string;
-  price?: number;
-  pageLength?: number;
-  type?: BookType;
-  coverUrl?: string;
-  authorId?: string;
-  publisherId?: string;
-  categoryId?: string;
-};
-
-/*export async function createBook(payload: BookPayload) {
-  try {
-    const newBook = await prisma?.book.create({
-      data: {
-        title: payload.title,
-        description: payload.description,
-        price: payload.price,
-        pageLength: payload.pageLength,
-        type: payload.type,
-        coverUrl: payload.coverUrl,
-        authorId: payload.authorId,
-        publisherId: payload.publisherId,
-        categoryId: payload.categoryId,
-      },
-    });
-
-    if (!newBook) {
-      return null;
-    } else {
-      return newBook as Book;
-    }
-  } catch (e) {
-    console.error('DatabaseError:', e);
-    return null;
-  }
-}*/
+/* end wishlist */

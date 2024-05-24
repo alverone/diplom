@@ -2,8 +2,8 @@ import LoadingView from '@/components/LoadingView';
 import OrderTile from '@/components/order_tile/OrderTile';
 import Pagination from '@/components/Pagination';
 import { getAppSession } from '@/lib/auth';
-import { fetchOrders, fetchOrdersPagesCount } from '@/lib/data';
-import { notFound, redirect, RedirectType } from 'next/navigation';
+import { getPaginatedOrdersWithCount } from '@/lib/data';
+import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 export default async function Page({
@@ -20,13 +20,13 @@ export default async function Page({
   }
 
   const userId = session.user?.id;
-  const [orders, pageCount] = await Promise.all([
-    fetchOrders(currentPage, userId),
-    fetchOrdersPagesCount(userId),
-  ]);
+  const { data: orders, count: pageCount } = await getPaginatedOrdersWithCount(
+    currentPage,
+    userId,
+  );
 
   if (currentPage > pageCount) {
-    redirect('/account/orders', RedirectType.replace);
+    redirect('/account/orders?page=1');
   } else if (!orders || orders.length === 0) {
     notFound();
   }

@@ -1,6 +1,6 @@
 import '@/app/globals.css';
-import Drawers from '@/components/Drawers';
 
+import Drawers from '@/components/Drawers';
 import SessionProvider from '@/components/SessionProvider';
 import StoreProvider from '@/components/StoreProvider';
 import { getAppSession } from '@/lib/auth';

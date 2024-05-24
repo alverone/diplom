@@ -3,11 +3,7 @@
 import AppInput from '@/components/AppInput';
 import AppTextarea from '@/components/AppTextarea';
 import { ButtonPrimary, ButtonSecondary } from '@/components/Buttons';
-import {
-  ActionResponse,
-  updateCategory,
-  ValidateCategoryErrors,
-} from '@/lib/action';
+import { ActionResponse, updateCategory } from '@/lib/action';
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
@@ -16,9 +12,7 @@ export default function UpdateCategoryForm({
 }: {
   category: Category;
 }) {
-  const [formState, setFormState] = useState<
-    ActionResponse<ValidateCategoryErrors>
-  >({});
+  const [formState, setFormState] = useState<ActionResponse>({});
 
   async function action(fd: FormData) {
     const { title, description } = {

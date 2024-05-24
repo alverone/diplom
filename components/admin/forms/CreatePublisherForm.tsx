@@ -3,20 +3,14 @@
 import AppInput from '@/components/AppInput';
 import AppTextarea from '@/components/AppTextarea';
 import { ButtonPrimary } from '@/components/Buttons';
-import {
-	ActionResponse,
-	createPublisher,
-	ValidateAuthorErrors,
-} from '@/lib/action';
+import { ActionResponse, createPublisher } from '@/lib/action';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
 export default function CreatePublisherForm() {
   const router = useRouter();
-  const [formState, setFormState] = useState<
-    ActionResponse<ValidateAuthorErrors>
-  >({});
+  const [formState, setFormState] = useState<ActionResponse>({});
 
   async function action(fd: FormData) {
     const res = await createPublisher(fd);
