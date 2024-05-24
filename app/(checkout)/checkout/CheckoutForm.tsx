@@ -3,7 +3,7 @@
 import AppInput from '@/components/AppInput';
 import AppTextarea from '@/components/AppTextarea';
 import { ButtonPrimary } from '@/components/Buttons';
-import { ActionResponse, createOrder, MakeOrderErrors } from '@/lib/action';
+import { ActionResponse, createOrder } from '@/lib/action';
 import { clearCart } from '@/lib/features/checkout/checkout_slice';
 import { useAppDispatch, useAppSelector, useAppSession } from '@/lib/hooks';
 import { useState } from 'react';
@@ -14,9 +14,7 @@ export default function CheckoutForm({ onSuccess }: { onSuccess: () => void }) {
   const dispatch = useAppDispatch();
   const { session } = useAppSession();
 
-  const [formState, setFormState] = useState<ActionResponse<MakeOrderErrors>>(
-    {},
-  );
+  const [formState, setFormState] = useState<ActionResponse>({});
 
   async function action(fd: FormData) {
     const res = await createOrder(session?.user?.id, books, fd);

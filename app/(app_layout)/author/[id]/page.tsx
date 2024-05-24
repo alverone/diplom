@@ -2,9 +2,9 @@ import BooksGrid from '@/components/BooksGrid';
 import LoadingView from '@/components/LoadingView';
 import NotFoundPlaceholder from '@/components/NotFoundPlaceholder';
 import {
-  fetchAuthorById,
-  fetchSimpleBooksByAuthor,
-  fetchSimpleBooksCountByAuthor,
+  CatalogBookLimit,
+  fetchSimpleBooksPaginatedWithCount,
+  getAuthorDetails,
 } from '@/lib/data';
 import { sortOrderFromString } from '@/lib/utils';
 import { Suspense } from 'react';
@@ -21,16 +21,21 @@ export default async function Page({
 
   const sortOrder = sortOrderFromString(searchParams.sortOrder);
   const currentPage = Number(page ?? '1');
-  const author = await fetchAuthorById(id);
+  const author = await getAuthorDetails(id);
 
   if (!author) {
     return <NotFoundPlaceholder />;
   }
 
-  const [pageCount, books] = await Promise.all([
-    fetchSimpleBooksCountByAuthor(author.id),
-    fetchSimpleBooksByAuthor(currentPage, author.id, sortOrder),
-  ]);
+  const { data: books, count: pageCount } =
+    await fetchSimpleBooksPaginatedWithCount(
+      currentPage,
+      sortOrder,
+      CatalogBookLimit.DEFAULT,
+      {
+        authorId: author.id,
+      },
+    );
 
   return (
     <main>

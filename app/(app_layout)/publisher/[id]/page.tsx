@@ -2,9 +2,9 @@ import BooksGrid from '@/components/BooksGrid';
 import LoadingView from '@/components/LoadingView';
 
 import {
-  fetchPublisherById,
-  fetchSimpleBooksByPublisher,
-  fetchSimpleBooksCountByPublisher,
+  CatalogBookLimit,
+  fetchSimpleBooksPaginatedWithCount,
+  getPublisherDetails,
 } from '@/lib/data';
 import { sortOrderFromString } from '@/lib/utils';
 import { notFound } from 'next/navigation';
@@ -18,22 +18,25 @@ export default async function Page({
   searchParams: { page?: string; sortOrder?: string };
 }) {
   const { id } = params;
-  const { page, sortOrder } = searchParams;
+  const { page } = searchParams;
+
+  const sortOrder = sortOrderFromString(searchParams.sortOrder);
   const currentPage = Number(page ?? '1');
-  const publisher = await fetchPublisherById(id);
+  const publisher = await getPublisherDetails(id);
 
   if (!publisher) {
     notFound();
   }
 
-  const [pageCount, books] = await Promise.all([
-    fetchSimpleBooksCountByPublisher(publisher.id),
-    fetchSimpleBooksByPublisher(
+  const { data: books, count: pageCount } =
+    await fetchSimpleBooksPaginatedWithCount(
       currentPage,
-      publisher.id,
-      sortOrderFromString(sortOrder),
-    ),
-  ]);
+      sortOrder,
+      CatalogBookLimit.DEFAULT,
+      {
+        publisherId: publisher.id,
+      },
+    );
 
   if (!books || books.length == 0) {
     notFound();

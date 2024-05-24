@@ -1,9 +1,5 @@
 import UpdateBookForm from '@/components/admin/forms/UpdateBookForm';
-import {
-  fetchAllAuthors,
-  fetchAllCategories,
-  fetchAllPublishers,
-} from '@/lib/data';
+import { getAllAuthors, getAllCategories, getAllPublishers } from '@/lib/data';
 import prisma from '@/lib/prisma';
 
 export default async function Page({ params }: { params: { id: string } }) {
@@ -16,9 +12,9 @@ export default async function Page({ params }: { params: { id: string } }) {
         category: true,
       },
     })) as Book | null,
-    fetchAllAuthors(),
-    fetchAllPublishers(),
-    fetchAllCategories(),
+    getAllAuthors(),
+    getAllPublishers(),
+    getAllCategories(),
   ]);
 
   return (

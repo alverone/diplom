@@ -1,6 +1,6 @@
 'use client';
 
-import { ActionResponse, updateUser, UpdateUserErrors } from '@/lib/action';
+import { ActionResponse, updateUser } from '@/lib/action';
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import AppInput from '../AppInput';
@@ -17,9 +17,7 @@ export default function UserInfoForm({
     email: string | null;
   };
 }) {
-  const [formState, setFormState] = useState<ActionResponse<UpdateUserErrors>>(
-    {},
-  );
+  const [formState, setFormState] = useState<ActionResponse>({});
 
   async function action(fd: FormData) {
     const res = await updateUser(user.id, fd);

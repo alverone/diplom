@@ -1,5 +1,4 @@
 import AdminNav from '@/components/admin/AdminNav';
-import LoadingView from '@/components/LoadingView';
 import SidebarTab from '@/components/SidebarTab';
 import { getAppSession } from '@/lib/auth';
 import { UserRole } from '@prisma/client';
@@ -14,8 +13,6 @@ export default async function AdminLayout({
 
   if (!session || !session.user || session.user.role !== UserRole.ADMIN) {
     redirect('/login?fromAdmin=true');
-
-    return <LoadingView />;
   }
 
   return (

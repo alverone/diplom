@@ -1,6 +1,6 @@
 import OrderTile from '@/components/order_tile/OrderTile';
 import Pagination from '@/components/Pagination';
-import { fetchAllOrders, fetchAllOrdersPagesCount } from '@/lib/data';
+import { getPaginatedOrdersWithCount } from '@/lib/data';
 import { redirect } from 'next/navigation';
 
 export default async function Page({
@@ -13,13 +13,11 @@ export default async function Page({
   const { page } = searchParams;
   const currentPage = Number(page ?? '1');
 
-  const [orders, pageCount] = await Promise.all([
-    fetchAllOrders(currentPage),
-    fetchAllOrdersPagesCount(),
-  ]);
+  const { data: orders, count: pageCount } =
+    await getPaginatedOrdersWithCount(currentPage);
 
   if (currentPage > pageCount) {
-    redirect('/admin/orders');
+    redirect('/admin/orders?page=1');
   }
 
   return (

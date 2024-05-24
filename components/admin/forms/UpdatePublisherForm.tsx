@@ -3,11 +3,7 @@
 import AppInput from '@/components/AppInput';
 import AppTextarea from '@/components/AppTextarea';
 import { ButtonPrimary, ButtonSecondary } from '@/components/Buttons';
-import {
-  ActionResponse,
-  updatePublisher,
-  ValidatePublisherErrors,
-} from '@/lib/action';
+import { ActionResponse, updatePublisher } from '@/lib/action';
 import { useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
@@ -16,9 +12,7 @@ export default function UpdatePublisherForm({
 }: {
   publisher: Publisher;
 }) {
-  const [formState, setFormState] = useState<
-    ActionResponse<ValidatePublisherErrors>
-  >({});
+  const [formState, setFormState] = useState<ActionResponse>({});
 
   async function action(fd: FormData) {
     const { name, description } = {

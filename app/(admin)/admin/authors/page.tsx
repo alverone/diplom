@@ -1,11 +1,7 @@
 import CreateButton from '@/components/admin/CreateButton';
 import AuthorsList from '@/components/admin/lists/AuthorsList';
 import Pagination from '@/components/Pagination';
-import {
-  CatalogBookLimit,
-  fetchAuthorsCount,
-  fetchAuthorsPaginated,
-} from '@/lib/data';
+import { CatalogBookLimit, getPaginatedAuthorsWithCount } from '@/lib/data';
 import { redirect } from 'next/navigation';
 
 export default async function Page({
@@ -18,13 +14,15 @@ export default async function Page({
   const { page } = searchParams;
   const currentPage = Number(page ?? '1');
 
-  const [authors, pageCount] = await Promise.all([
-    fetchAuthorsPaginated(currentPage, null, CatalogBookLimit.Admin),
-    fetchAuthorsCount(CatalogBookLimit.Admin),
-  ]);
+  const { data: authors, count: pageCount } =
+    await getPaginatedAuthorsWithCount(
+      currentPage,
+      null,
+      CatalogBookLimit.ADMIN,
+    );
 
   if (currentPage > pageCount) {
-    redirect('/admin/authors');
+    redirect('/admin/authors?page=1');
   }
 
   return (

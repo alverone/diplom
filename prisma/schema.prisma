@@ -19,10 +19,10 @@ model Book {
   categoryId  String    @map("category_id")
   publisherId String    @map("publisher_id")
   authorId    String    @map("author_id")
+  coverUrl    String?   @map("cover_url")
   author      Author    @relation(fields: [authorId], references: [id], onDelete: Cascade)
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   publisher   Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
-  coverUrl    String?   @map("cover_url")
 
   @@map("books")
 }
@@ -58,36 +58,33 @@ model User {
   id            String    @id @default(cuid())
   name          String
   email         String    @unique
-  emailVerified DateTime?
+  emailVerified DateTime? @map("email_verified")
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
   password      String
   surname       String
-  wishesIds     String[]
+  wishesIds     String[]  @map("wishes_ids")
   phone         String
-  orderIds      String[]
+  orderIds      String[]  @map("order_ids")
+  role          UserRole  @default(USER)
   orders        Order[]
-  role UserRole @default(USER)
 }
 
 model Order {
-  id        Int         @id @default(autoincrement())
-  price     Float
-  bookIds   String[]    @map("book_ids")
-  status    OrderStatus
-
-  fullName  String      @map("full_name")
-  email     String
-  phone     String
-  address   String
+  status      OrderStatus
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  userId      String?     @map("user_id")
+  bookIds     String[]    @map("book_ids")
+  id          Int         @id @default(autoincrement())
+  price       Float
+  email       String
+  fullName    String      @map("full_name")
+  phone       String
+  address     String
   description String?
-
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-
-  userId    String?     @map("user_id")
-  user      User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("orders")
 }
@@ -104,9 +101,9 @@ enum BookType {
 }
 
 enum OrderStatus {
-  CREATED
   ACCEPTED
   PROCESSING
-  SHIPPED
   COMPLETED
+  CREATED
+  SHIPPED
 }

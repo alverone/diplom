@@ -4,7 +4,7 @@ import AppFormSelect from '@/components/AppFormSelect';
 import AppInput from '@/components/AppInput';
 import AppTextarea from '@/components/AppTextarea';
 import { ButtonPrimary, ButtonSecondary } from '@/components/Buttons';
-import { ActionResponse, updateBook, ValidateBookErrors } from '@/lib/action';
+import { ActionResponse, updateBook } from '@/lib/action';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -22,9 +22,7 @@ export default function UpdateBookForm({
   categories: Category[];
 }) {
   const router = useRouter();
-  const [formState, setFormState] = useState<
-    ActionResponse<ValidateBookErrors>
-  >({});
+  const [formState, setFormState] = useState<ActionResponse>({});
 
   async function action(fd: FormData) {
     const res = await updateBook(book.id, fd);
