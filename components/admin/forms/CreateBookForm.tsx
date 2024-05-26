@@ -46,7 +46,7 @@ export default function CreateBookForm({
       className="flex max-h-full w-full max-w-2xl flex-col gap-y-5"
     >
       <h2 className="mb-1 text-lg font-semibold text-neutral-950 sm:text-xl md:text-2xl">
-        Книга
+        Нова книга
       </h2>
       <AppInput
         label="Обкладинка *"

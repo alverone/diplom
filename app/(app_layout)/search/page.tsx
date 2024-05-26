@@ -2,8 +2,13 @@ import BooksGrid from '@/components/BooksGrid';
 import Pagination from '@/components/Pagination';
 import { getPaginatedFilteredSimpleBooks } from '@/lib/data';
 import { sortOrderFromString } from '@/lib/utils';
+import { Metadata } from 'next';
 import { redirect, RedirectType } from 'next/navigation';
 import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Пошук',
+};
 
 export default async function Page({
   searchParams,

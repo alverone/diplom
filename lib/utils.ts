@@ -69,6 +69,8 @@ export function sortOrderFromString(sortOrder: string | undefined | null) {
       return SortOrder.TitleAsc;
     case 'title_desc':
       return SortOrder.TitleDesc;
+    case 'time':
+      return SortOrder.Time;
     default:
       return null;
   }
