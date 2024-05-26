@@ -36,6 +36,7 @@ export default function SearchView({ placeholder }: { placeholder: string }) {
       <button
         type="submit"
         onClick={() => handleSearch(text)}
+        aria-label="Пошук"
         className="flex cursor-pointer appearance-none flex-row items-center justify-center gap-x-1.5 rounded-r border-none bg-orange-500 px-4 py-3 text-base font-semibold text-neutral-50 transition-colors duration-200 ease-in-out hover:bg-orange-600 focus:bg-orange-400"
       >
         <MagnifyingGlassIcon width={24} height={24} color="#0d0d0d" />

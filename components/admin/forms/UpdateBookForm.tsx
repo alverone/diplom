@@ -146,7 +146,11 @@ export default function UpdateBookForm({
 
       <div className="flex w-full flex-col gap-y-2">
         <h2 className="text-lg font-medium text-neutral-950">Автор:</h2>
-        <AppFormSelect defaultValue={book.type} name="authorId" id="authorId">
+        <AppFormSelect
+          defaultValue={book.authorId}
+          name="authorId"
+          id="authorId"
+        >
           {authors.map((author) => (
             <option key={author.id} value={author.id}>
               {author.name}
@@ -158,7 +162,7 @@ export default function UpdateBookForm({
       <div className="flex w-full flex-col gap-y-2">
         <h2 className="text-lg font-medium text-neutral-950">Видавництво:</h2>
         <AppFormSelect
-          defaultValue={book.type}
+          defaultValue={book.publisherId}
           name="publisherId"
           id="publisherId"
         >
@@ -173,7 +177,7 @@ export default function UpdateBookForm({
       <div className="flex w-full flex-col gap-y-2">
         <h2 className="text-lg font-medium text-neutral-950">Категорія:</h2>
         <AppFormSelect
-          defaultValue={book.type}
+          defaultValue={book.categoryId}
           name="categoryId"
           id="categoryId"
         >

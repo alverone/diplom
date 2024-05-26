@@ -9,48 +9,6 @@ import { getAppSession } from './auth';
 import prisma from './prisma';
 import { bookTypeFromString, orderStatusFromString } from './utils';
 
-const requiredZodString = z
-  .string()
-  .trim()
-  .min(1, { message: 'Обовʼязкове поле' });
-
-const createSchema = z.object({
-  email: z.string().email({ message: 'Невірний email' }),
-  password: z
-    .string()
-    .min(8, { message: 'Пароль повинен містити не менше 8 символів' }),
-  name: requiredZodString,
-  surname: requiredZodString,
-  phone: z
-    .string({
-      required_error: 'Обовʼязкове поле',
-    })
-    .min(1),
-});
-
-const updateSchema = z.object({
-  email: z.string().email({ message: 'Невірний email' }),
-  name: requiredZodString,
-  surname: requiredZodString,
-  phone: z
-    .string({
-      required_error: 'Обовʼязкове поле',
-    })
-    .min(1),
-});
-
-const makeOrderSchema = z.object({
-  email: z.string().email({ message: 'Невірний email' }),
-  name: requiredZodString,
-  surname: requiredZodString,
-  phone: z
-    .string({
-      required_error: 'Обовʼязкове поле',
-    })
-    .min(1),
-  address: requiredZodString,
-});
-
 export interface ActionResponse {
   message?: string;
   status?: number;
@@ -67,7 +25,26 @@ export async function createUser(fd: FormData): Promise<ActionResponse> {
       phone: fd.get('phone') as string,
     };
 
-    const validatedFields = createSchema.safeParse(userPayload);
+    console.log('phone : ', userPayload.phone);
+
+    const validatedFields = z
+      .object({
+        email: z.string().email({ message: 'Невірний email' }),
+        password: z
+          .string()
+          .min(8, { message: 'Пароль повинен містити не менше 8 символів' }),
+        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        surname: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        phone: z
+          .string({
+            required_error: 'Обовʼязкове поле',
+          })
+          .refine((phone) => !phone.includes('_'), {
+            message: 'Обовʼязкове поле',
+          }),
+      })
+      .safeParse(userPayload);
+
     if (!validatedFields.success) {
       return {
         status: 400,
@@ -135,7 +112,18 @@ export async function updateUser(
       phone: fd.get('phone') as string,
     };
 
-    const validatedFields = updateSchema.safeParse(userPayload);
+    const validatedFields = z
+      .object({
+        email: z.string().email({ message: 'Невірний email' }),
+        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        surname: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        phone: z
+          .string({
+            required_error: 'Обовʼязкове поле',
+          })
+          .min(1),
+      })
+      .safeParse(userPayload);
     if (!validatedFields.success) {
       return {
         status: 400,
@@ -303,7 +291,19 @@ export async function createOrder(
       description: fd.get('description') as string,
     };
 
-    const validatedFields = makeOrderSchema.safeParse(userPayload);
+    const validatedFields = z
+      .object({
+        email: z.string().email({ message: 'Невірний email' }),
+        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        surname: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        phone: z
+          .string({
+            required_error: 'Обовʼязкове поле',
+          })
+          .min(1),
+        address: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+      })
+      .safeParse(userPayload);
     if (!validatedFields.success) {
       return {
         status: 400,
@@ -375,7 +375,7 @@ export async function updateCategory(fd: FormData): Promise<ActionResponse> {
 
     const validatedFields = z
       .object({
-        title: requiredZodString,
+        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
       })
       .safeParse(categoryPayload);
 
@@ -424,7 +424,7 @@ export async function createCategory(fd: FormData): Promise<ActionResponse> {
 
     const validatedFields = z
       .object({
-        title: requiredZodString,
+        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
       })
       .safeParse(categoryPayload);
 
@@ -471,7 +471,7 @@ export async function updateAuthor(fd: FormData): Promise<ActionResponse> {
 
     const validatedFields = z
       .object({
-        name: requiredZodString,
+        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
       })
       .safeParse(authorPayload);
 
@@ -520,7 +520,7 @@ export async function createAuthor(fd: FormData): Promise<ActionResponse> {
 
     const validatedFields = z
       .object({
-        name: requiredZodString,
+        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
       })
       .safeParse(authorPayload);
 
@@ -566,7 +566,7 @@ export async function updatePublisher(fd: FormData): Promise<ActionResponse> {
     };
     const validatedFields = z
       .object({
-        name: requiredZodString,
+        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
       })
       .safeParse(publisherPayload);
 
@@ -615,7 +615,7 @@ export async function createPublisher(fd: FormData): Promise<ActionResponse> {
 
     const validatedFields = z
       .object({
-        name: requiredZodString,
+        name: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
       })
       .safeParse(publisherPayload);
 
@@ -763,8 +763,8 @@ export async function updateBook(
 
     const validatedFields = z
       .object({
-        title: requiredZodString,
-        description: requiredZodString,
+        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        description: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
         price: z
           .number({ message: 'Обовʼязкове поле' })
           .min(0.01, { message: 'Ціна повинна бути більше 0' }),
@@ -899,8 +899,8 @@ export async function createBook(fd: FormData): Promise<ActionResponse> {
 
     const validatedFields = z
       .object({
-        title: requiredZodString,
-        description: requiredZodString,
+        title: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        description: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
         price: z
           .number({ message: 'Обовʼязкове поле' })
           .min(0.01, { message: 'Ціна повинна бути більше 0' }),
@@ -1027,10 +1027,10 @@ export async function updateOrder(fd: FormData): Promise<ActionResponse> {
 
     const validatedFields = z
       .object({
-        fullName: requiredZodString,
+        fullName: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
         email: z.string().email({ message: 'Невірний email' }),
-        phone: requiredZodString,
-        address: requiredZodString,
+        phone: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
+        address: z.string().trim().min(1, { message: 'Обовʼязкове поле' }),
         price: z.number().min(0.01, { message: 'Ціна повинна бути більше 0' }),
         status: z.nativeEnum(OrderStatus),
         id: z.number().int().positive(),

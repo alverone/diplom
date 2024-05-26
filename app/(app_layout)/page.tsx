@@ -2,8 +2,14 @@ import BooksGrid from '@/components/BooksGrid';
 import LoadingView from '@/components/LoadingView';
 import { fetchSimpleBooksPaginatedWithCount } from '@/lib/data';
 import { sortOrderFromString } from '@/lib/utils';
+import { Metadata } from 'next';
+
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Каталог',
+};
 
 export default async function Page({
   searchParams,
