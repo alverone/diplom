@@ -5,7 +5,12 @@ import {
   CatalogBookLimit,
   fetchSimpleBooksPaginatedWithCount,
 } from '@/lib/data';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Каталог',
+};
 
 export default async function Page({
   searchParams,

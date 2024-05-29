@@ -1,7 +1,12 @@
 import OrderTile from '@/components/order_tile/OrderTile';
 import Pagination from '@/components/Pagination';
 import { getPaginatedOrdersWithCount } from '@/lib/data';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Замовлення',
+};
 
 export default async function Page({
   searchParams,

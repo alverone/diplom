@@ -1,6 +1,11 @@
 import UpdateBookForm from '@/components/admin/forms/UpdateBookForm';
 import { getAllAuthors, getAllCategories, getAllPublishers } from '@/lib/data';
 import prisma from '@/lib/prisma';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Редагування книги',
+};
 
 export default async function Page({ params }: { params: { id: string } }) {
   const [book, authors, publishers, categories] = await Promise.all([

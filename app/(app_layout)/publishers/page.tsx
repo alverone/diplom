@@ -1,6 +1,11 @@
 import { getAllPublishers } from '@/lib/data';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import styles from './styles.module.css';
+
+export const metadata: Metadata = {
+  title: 'Видавництва',
+};
 
 export default async function Page() {
   const publishers = await getAllPublishers();

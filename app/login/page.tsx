@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import LoginPageComponent from './LoginPageComponent';
 
 export const metadata: Metadata = {
-  title: 'Авторизація',
+  title: 'Авторизуватись',
 };
 
 export default function Page({

@@ -6,8 +6,13 @@ import {
   getCategoryDetails,
 } from '@/lib/data';
 import { sortOrderFromString } from '@/lib/utils';
+import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Книги за категорією',
+};
 
 export default async function Page({
   params,

@@ -2,7 +2,12 @@ import CreateButton from '@/components/admin/CreateButton';
 import CategoriesList from '@/components/admin/lists/CategoriesList';
 import Pagination from '@/components/Pagination';
 import { CatalogBookLimit, getPaginatedCategoriesWithCount } from '@/lib/data';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Категорії',
+};
 
 export default async function Page({
   searchParams,
