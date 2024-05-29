@@ -4,10 +4,14 @@ import { getAppSession } from '@/lib/auth';
 import { getBookDetails } from '@/lib/data';
 import prisma from '@/lib/prisma';
 import { formatCurrency } from '@/lib/utils';
+import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-
 import { notFound } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Про книгу',
+};
 
 export default async function Page({ params }: { params: { id: string } }) {
   const session = await getAppSession();

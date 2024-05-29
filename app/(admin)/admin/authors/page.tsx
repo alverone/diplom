@@ -2,7 +2,12 @@ import CreateButton from '@/components/admin/CreateButton';
 import AuthorsList from '@/components/admin/lists/AuthorsList';
 import Pagination from '@/components/Pagination';
 import { CatalogBookLimit, getPaginatedAuthorsWithCount } from '@/lib/data';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Автори',
+};
 
 export default async function Page({
   searchParams,

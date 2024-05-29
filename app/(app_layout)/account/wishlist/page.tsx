@@ -3,8 +3,13 @@ import LoadingView from '@/components/LoadingView';
 import { getAppSession } from '@/lib/auth';
 import { getUserWishedBooks } from '@/lib/data';
 import { sortOrderFromString } from '@/lib/utils';
+import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Список бажаних',
+};
 
 export default async function Page({ searchParams }: PaginatedSearchParams) {
   const session = await getAppSession();

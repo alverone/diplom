@@ -3,8 +3,13 @@ import OrderTile from '@/components/order_tile/OrderTile';
 import Pagination from '@/components/Pagination';
 import { getAppSession } from '@/lib/auth';
 import { getPaginatedOrdersWithCount } from '@/lib/data';
+import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Мої замовлення',
+};
 
 export default async function Page({
   searchParams,

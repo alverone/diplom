@@ -1,6 +1,11 @@
 import { getAllCategories } from '@/lib/data';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import styles from './styles.module.css';
+
+export const metadata: Metadata = {
+  title: 'Категорії',
+};
 
 export default async function Page() {
   const categories = await getAllCategories();

@@ -1,14 +1,18 @@
 import BooksGrid from '@/components/BooksGrid';
 import LoadingView from '@/components/LoadingView';
-
 import {
   CatalogBookLimit,
   fetchSimpleBooksPaginatedWithCount,
   getPublisherDetails,
 } from '@/lib/data';
 import { sortOrderFromString } from '@/lib/utils';
+import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Книги видавництва',
+};
 
 export default async function Page({
   params,

@@ -7,7 +7,12 @@ import {
   getAuthorDetails,
 } from '@/lib/data';
 import { sortOrderFromString } from '@/lib/utils';
+import { Metadata } from 'next';
 import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Книги автора',
+};
 
 export default async function Page({
   params,

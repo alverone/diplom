@@ -1,11 +1,15 @@
 import UserInfoForm from '@/components/forms/UserInfoForm';
 import LoadingView from '@/components/LoadingView';
-
 import { getAppSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { Metadata } from 'next';
 import { signOut } from 'next-auth/react';
 import { redirect, RedirectType } from 'next/navigation';
 import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Особиста інформація',
+};
 
 export default async function Page() {
   const session = await getAppSession();
